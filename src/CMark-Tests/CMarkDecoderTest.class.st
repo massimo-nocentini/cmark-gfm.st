@@ -176,6 +176,24 @@ CMarkDecoderTest >> testByteOrderMarks [
 ]
 
 { #category : 'tests' }
+CMarkDecoderTest >> testClassMapIgnoresInheritedCodes [
+	"A subclass of a node class inherits its typeCode, but only the class that defines a code owns it: the map and the decoding stay as they were"
+
+	| subclass classes b doc |
+	subclass := CMarkHeading subclass: #CMarkDecoderTestHeading.
+	[
+	self assert: subclass typeCode equals: CMarkHeading typeCode.
+	classes := CMarkTreeDecoder new classes.
+	self assert: (classes at: CMarkHeading typeCode) identicalTo: CMarkHeading.
+	self deny: (classes includes: subclass).
+	b := self builder.
+	b at: (b add: CMarkHeading typeCode parent: 1) int1: 2.
+	doc := b decode.
+	self assert: doc firstChild class identicalTo: CMarkHeading.
+	self assert: doc firstChild level equals: 2 ] ensure: [ subclass removeFromSystem ]
+]
+
+{ #category : 'tests' }
 CMarkDecoderTest >> testCodeBlocks [
 	| b f i doc fenced indented |
 	b := self builder.

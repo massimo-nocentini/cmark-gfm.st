@@ -7,7 +7,7 @@ Navigation: parent, children, document, firstChild, lastChild, nextSibling, prev
 
 Building by hand: new answers a node with no children, addChild: sets the parent and answers the child, withAll: and with: take a collection of children, and the subclasses have constructors (CMarkText literal:, CMarkHeading level:with:, CMarkList ordered:, CMarkTable alignments:...).
 
-Decoding (CMarkTreeDecoder): typeCode is answered only by the class that owns a code of the tape, cmarkClassForFlags: picks the flag variant, and cmarkRead:record: reads the fields of the type.
+Decoding (CMarkTreeDecoder): typeCode is defined only by the class that owns a code of the tape (a subclass inherits it, but the decoder maps the code to the owner), cmarkClassForFlags: picks the flag variant, and cmarkRead:record: reads the fields of the type.
 "
 Class {
 	#name : 'CMarkNode',
@@ -49,7 +49,7 @@ CMarkNode class >> new [
 
 { #category : 'accessing' }
 CMarkNode class >> typeCode [
-	"The code of my type in the tape of the plugin, or nil: only the class that owns a code answers it (not the abstract classes, not the flag variants CMarkTaskItem and CMarkTableHeaderRow)"
+	"The code of my type in the tape of the plugin, or nil: only the class that owns a code defines it to answer the code (not the abstract classes, not the flag variants CMarkTaskItem and CMarkTableHeaderRow, which answer nil); a subclass of an owner inherits the code but does not own it, so the tape still decodes to the owner"
 
 	^ nil
 ]

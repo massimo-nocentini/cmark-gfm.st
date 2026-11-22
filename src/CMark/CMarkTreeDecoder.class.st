@@ -109,12 +109,12 @@ CMarkTreeDecoder >> classForCode: anInteger [
 
 { #category : 'decoding' }
 CMarkTreeDecoder >> classes [
-	"The node classes by their codes: only the classes that own a code (typeCode not nil); two owners of one code are an error"
+	"The node classes by their codes: only the classes that own a code, that is that define typeCode themselves and answer a code (a subclass that inherits the code, such as a specialisation in another package, is not an owner); two owners of one code are an error"
 
 	classes ifNotNil: [ ^ classes ].
 	classes := Dictionary new.
 	CMarkNode allSubclasses do: [ :each |
-		each typeCode ifNotNil: [ :code |
+		((each class includesSelector: #typeCode) ifTrue: [ each typeCode ]) ifNotNil: [ :code |
 			(classes includesKey: code) ifTrue: [
 				CMarkError signal:
 					(classes at: code) name , ' and ' , each name , ' both answer the code ' , code printString ].
