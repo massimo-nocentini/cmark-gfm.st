@@ -53,6 +53,26 @@ CMarkRoassalBlockTest >> testCodeBlockTabsAndFinalLineFeed [
 ]
 
 { #category : 'tests' }
+CMarkRoassalBlockTest >> testCodeLanguageNeverCoversTheCode [
+	"The first word of the info sits at the top right of the box: when a line beside it would reach it, the code starts under it, in every codeWrap mode; beside short lines it takes no room"
+
+	| long short shape labels code |
+	long := CMarkCodeBlock literal: 'Transcript show: ''a first line that runs to the right edge of the box''; cr; show: ' , (String new: 60 withAll: $x) , String lf , 'second' , String lf info: 'smalltalk'.
+	#( #none #characters #clip ) do: [ :mode |
+		| language |
+		shape := self render: (self document: { long }) theme: (CMarkRoassalTheme default codeWrap: mode; yourself).
+		labels := self labelsOf: shape.
+		language := labels detect: [ :each | each key text = 'smalltalk' ].
+		labels do: [ :each |
+			each == language ifFalse: [ self deny: (each value intersects: language value) description: mode , ': ' , each key text ] ] ].
+	short := CMarkCodeBlock literal: 'x := 1.' , String lf info: 'smalltalk'.
+	shape := self render: short.
+	code := (self labelsOf: shape) detect: [ :each | each key text = 'x := 1.' ].
+	self assert: (code value top - renderer theme codePadding) abs < 0.01.
+	self assert: (shape extent y - (renderer fonts heightOf: (renderer monoStyleFrom: renderer theme baseStyle)) - (2 * renderer theme codePadding)) abs < 0.01
+]
+
+{ #category : 'tests' }
 CMarkRoassalBlockTest >> testCodeWrapModes [
 	| block long padding none characters clip |
 	long := String new: 200 withAll: $x.

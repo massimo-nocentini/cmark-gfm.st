@@ -634,6 +634,16 @@ CMarkRoassalRenderer >> labelFor: aString style: aStyle node: aNode [
 ]
 
 { #category : 'code' }
+CMarkRoassalRenderer >> lines: aCollection left: aLeft top: aTop lineHeight: aLineHeight reach: aRight above: aBottom [
+	"Whether a line of the widths of aCollection, placed at aLeft from aTop and aLineHeight apart, that starts above aBottom ends right of aRight"
+
+	aCollection doWithIndex: [ :each :i |
+		aTop + (i - 1 * aLineHeight) < aBottom ifFalse: [ ^ false ].
+		aLeft + each > aRight ifTrue: [ ^ true ] ].
+	^ false
+]
+
+{ #category : 'code' }
 CMarkRoassalRenderer >> linesBlock: aCollection style: aStyle node: aNode [
 	"The lines of aCollection, one label each (none for an empty line), without a box"
 
@@ -1074,47 +1084,59 @@ CMarkRoassalRenderer >> visitCode: aCode [
 
 { #category : 'visiting' }
 CMarkRoassalRenderer >> visitCodeBlock: aCodeBlock [
-	| style lines pad lineHeight shapes y textWidth boxWidth height box language width |
+	"The lines on the box, and the info's first word small and muted at its top right; when a line beside that word would reach it, the code starts under it"
+
+	| style lines widths pad lineHeight shapes top y textWidth boxWidth height box language label width |
 	width := context availableWidth.
 	style := self monoStyleFrom: context baseStyle.
 	pad := theme codePadding.
 	lines := aCodeBlock lines collect: [ :each | self singleLine: (self expandTabs: each) trimRight ].
 	theme codeWrap = #characters ifTrue: [ lines := self codeLines: lines style: style width: width - (2 * pad) ].
+	widths := lines collect: [ :each |
+		          each isEmpty
+			          ifTrue: [ 0 ]
+			          ifFalse: [ fonts widthOf: each in: style ] ].
+	textWidth := widths inject: 0 into: [ :max :each | max max: each ].
 	lineHeight := fonts heightOf: style.
-	shapes := OrderedCollection new.
-	y := pad.
-	textWidth := 0.
-	lines do: [ :each |
-		each isEmpty ifFalse: [
-			| label |
-			label := self labelFor: each style: style node: aCodeBlock.
-			label translateTo: pad + (label width / 2) @ (y + (label height / 2)).
-			shapes add: label.
-			textWidth := textWidth max: (fonts widthOf: each in: style) ].
-		y := y + lineHeight ].
-	height := (lines size max: 1) * lineHeight + (2 * pad).
 	boxWidth := theme codeWrap = #none
 		            ifTrue: [ width max: textWidth + (2 * pad) ]
 		            ifFalse: [ width ].
-	box := self boxFrom: 0 @ 0 to: boxWidth @ height color: theme codeBackground node: aCodeBlock.
-	box cornerRadius: theme cornerRadius.
-	shapes addFirst: box.
+	shapes := OrderedCollection new.
+	top := pad.
 	language := aCodeBlock language.
 	language ifNotNil: [
-		| label |
 		label := self
 			         labelFor: (self singleLine: language)
 			         style: ((context baseStyle withSize: theme fontSize * 0.75) withColor: theme mutedColor)
 			         node: aCodeBlock.
 		label translateTo: boxWidth - (pad / 2) - (label width / 2) @ (2 + (label height / 2)).
-		shapes add: label ].
+		(self
+			 lines: widths
+			 left: pad
+			 top: pad
+			 lineHeight: lineHeight
+			 reach: boxWidth - pad - label width
+			 above: 2 + label height) ifTrue: [ top := pad max: 2 + label height + (pad / 2) ] ].
+	y := top.
+	lines do: [ :each |
+		each isEmpty ifFalse: [
+			| line |
+			line := self labelFor: each style: style node: aCodeBlock.
+			line translateTo: pad + (line width / 2) @ (y + (line height / 2)).
+			shapes add: line ].
+		y := y + lineHeight ].
+	height := top + ((lines size max: 1) * lineHeight) + pad.
+	box := self boxFrom: 0 @ 0 to: boxWidth @ height color: theme codeBackground node: aCodeBlock.
+	box cornerRadius: theme cornerRadius.
+	shapes addFirst: box.
+	label ifNotNil: [ shapes add: label ].
 	theme codeWrap = #clip ifTrue: [ shapes := { (self clippedComposite: shapes extent: boxWidth @ height node: aCodeBlock) } ].
 	^ self
 		  block: aCodeBlock
 		  shapes: shapes
 		  width: width
 		  height: height
-		  baseline: pad + (fonts ascentOf: style)
+		  baseline: top + (fonts ascentOf: style)
 		  natural: textWidth + (2 * pad)
 		  min: textWidth + (2 * pad)
 ]
