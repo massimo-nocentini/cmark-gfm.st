@@ -9,7 +9,7 @@ Every visit answers a CMarkRoassalBlock: an RSComposite whose top-left is its lo
 
 The context of a block (CMarkRoassalContext: available width, base style, list, bullet and quote depths, nesting) is passed down immutable and kept in my context only for one visit.  Inline content is flattened by CMarkInlineRunCollector and laid out by CMarkInlineFlow.  Fonts and measures are cached per rendering by CMarkRoassalFonts and dropped at the end of render:.
 
-Budgets (CMarkRoassalTheme): blocks deeper than maxNesting are rendered flat (their plainText in a muted paragraph); when maxShapes shapes exist, the rest of the document is one muted paragraph 'N more blocks not shown'; a table of more than maxTableCells cells is a placeholder.
+Budgets (CMarkRoassalTheme): blocks deeper than maxNesting are rendered flat (their cmarkRoassalFlatText in a muted paragraph); when maxShapes shapes exist, the rest of the document is one muted paragraph 'N more blocks not shown'; a table of more than maxTableCells cells is a placeholder.
 
 Interactions: every piece inside a link (labels, code chips, images) and every footnote reference shares one RSPopup and has a click subscription made with when:do:for: (never the deprecated when:do:, which rewrites the sender at run time).  A click on an anchor link (#slug) or on a footnote reference moves the camera of the canvas to the heading or the definition; other links go to the linkAction of the theme.  canvasFor: fits the width and shows the top of the document instead of zooming to fit.
 "
@@ -391,7 +391,7 @@ CMarkRoassalRenderer >> fitWidthAndTop: aShape in: aCanvas [
 
 { #category : 'blocks' }
 CMarkRoassalRenderer >> flatBlockFor: aNode in: aContext [
-	"aNode, nested too deep, as its plainText in a muted paragraph"
+	"aNode, nested too deep, as its text in a muted paragraph (cmarkRoassalFlatText: its blocks a space apart)"
 
 	| saved |
 	saved := context.
@@ -400,7 +400,7 @@ CMarkRoassalRenderer >> flatBlockFor: aNode in: aContext [
 	  self
 		  flowBlockForRuns: { (CMarkInlineRun
 				   kind: #text
-				   string: aNode plainText
+				   string: aNode cmarkRoassalFlatText
 				   style: (aContext baseStyle withColor: theme mutedColor)
 				   node: aNode) }
 		  style: aContext baseStyle

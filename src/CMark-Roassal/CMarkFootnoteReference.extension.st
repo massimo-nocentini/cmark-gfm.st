@@ -10,9 +10,9 @@ CMarkFootnoteReference >> cmarkRoassalFollowIn: aRenderer targets: aDictionary c
 
 { #category : '*CMark-Roassal' }
 CMarkFootnoteReference >> cmarkRoassalPopupText [
-	"The text of my definition"
+	"The text of my definition, its blocks a space apart (cmarkRoassalFlatText)"
 
 	^ definition
 		  ifNil: [ '[^' , ordinal printString , ']' ]
-		  ifNotNil: [ :each | each plainText ]
+		  ifNotNil: [ :each | each cmarkRoassalFlatText ]
 ]

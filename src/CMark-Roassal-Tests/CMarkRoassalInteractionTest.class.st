@@ -27,6 +27,18 @@ CMarkRoassalInteractionTest >> subscribersOf: aShape [
 ]
 
 { #category : 'tests' }
+CMarkRoassalInteractionTest >> testFootnotePopupKeepsTheParagraphsApart [
+	| definition reference |
+	definition := CMarkFootnoteDefinition label: 'n'.
+	definition addChild: (self paragraph: { (self text: 'The first paragraph.') }).
+	definition addChild: (self paragraph: { (self text: 'The second one.') }).
+	definition addChild: (CMarkCodeBlock literal: 'x := 1.' , String lf info: 'smalltalk').
+	reference := CMarkFootnoteReference new.
+	definition addReference: reference.
+	self assert: reference cmarkRoassalPopupText equals: 'The first paragraph. The second one. x := 1.'
+]
+
+{ #category : 'tests' }
 CMarkRoassalInteractionTest >> testLinkAction [
 	| doc theme followed shape link |
 	followed := OrderedCollection new.

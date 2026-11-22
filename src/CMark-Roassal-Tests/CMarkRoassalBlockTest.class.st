@@ -92,6 +92,19 @@ CMarkRoassalBlockTest >> testEmptyHeadingHasOneLine [
 ]
 
 { #category : 'tests' }
+CMarkRoassalBlockTest >> testFlatRenderingKeepsTheBlocksApart [
+	"Beyond maxNesting a block is one muted paragraph of the text of its blocks, a space apart, code included"
+
+	| quote shape |
+	quote := CMarkBlockQuote with: {
+			         (self paragraph: { (self text: 'one') }).
+			         (self paragraph: { (self text: 'two') }).
+			         (CMarkCodeBlock literal: 'x := 1.' , String lf , 'y := 2.' , String lf info: '') }.
+	shape := self render: (self document: { quote }) theme: (CMarkRoassalTheme default maxNesting: 0; yourself).
+	self assert: (self texts: shape) equals: #( 'one two x := 1. y := 2.' )
+]
+
+{ #category : 'tests' }
 CMarkRoassalBlockTest >> testFontFallback [
 	"A missing family falls back to the default family of RSLabel at the size of the theme"
 
