@@ -277,7 +277,7 @@ CMarkTreeDecoder >> string2At: base [
 
 { #category : 'decoding' }
 CMarkTreeDecoder >> stringAt: offset length: length ascii: aBoolean [
-	"The String of the length bytes of the strings after the 0-based offset: a ByteString copied by a primitive when aBoolean (only bytes below 128), else decoded from UTF-8"
+	"The String of the length bytes of the strings after the 0-based offset: a ByteString copied by a primitive when aBoolean (only bytes below 128), else decoded from UTF-8, keeping every U+FEFF"
 
 	length = 0 ifTrue: [ ^ String new ].
 	offset + length <= strings size ifFalse: [
@@ -289,7 +289,7 @@ CMarkTreeDecoder >> stringAt: offset length: length ascii: aBoolean [
 			  to: length
 			  with: strings
 			  startingAt: offset + 1 ].
-	^ [ (strings copyFrom: offset + 1 to: offset + length) utf8Decoded ]
+	^ [ (strings copyFrom: offset + 1 to: offset + length) cmarkUtf8Decoded ]
 		  on: ZnCharacterEncodingError
 		  do: [ :e | self malformed: 'a string is not UTF-8' ]
 ]

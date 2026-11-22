@@ -99,12 +99,12 @@ CMarkFormatter >> options: aCMarkOptions [
 
 { #category : 'rendering' }
 CMarkFormatter >> render: aStringOrByteArray [
-	"The Markdown aStringOrByteArray rendered, as a String: a ByteString copied from the bytes when the output is ASCII, else decoded from UTF-8"
+	"The Markdown aStringOrByteArray rendered, as a String: a ByteString copied from the bytes when the output is ASCII, else decoded from UTF-8, keeping every U+FEFF"
 
 	| answer bytes |
 	answer := self renderAnswer: aStringOrByteArray.
 	bytes := (answer at: 3) ifNil: [ ByteArray new ].
-	(answer at: 4) == true ifFalse: [ ^ bytes utf8Decoded ].
+	(answer at: 4) == true ifFalse: [ ^ bytes cmarkUtf8Decoded ].
 	^ (ByteString new: bytes size)
 		  replaceFrom: 1
 		  to: bytes size

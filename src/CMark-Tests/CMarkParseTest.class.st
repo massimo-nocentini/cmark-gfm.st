@@ -177,7 +177,26 @@ CMarkParseTest >> testByteArraySources [
 	self assert: fromBytes sanitised isNil.
 	self assert: fromBytes sourceString equals: text.
 	self assert: fromBytes treeString equals: fromWide treeString.
-	self assert: (fromBytes allNodes collect: [ :each | each sourceText ]) equals: (fromWide allNodes collect: [ :each | each sourceText ])
+	self assert: (fromBytes allNodes collect: [ :each | each sourceText ]) equals: (fromWide allNodes collect: [ :each | each sourceText ]).
+	"a byte-order mark, at the start (cmark counts it in the columns of line 1) and later (cmark keeps it in the text)"
+	text := (self stringOf: #( 16rFEFF 35 32 72 105 10 10 120 16rFEFF 121 10 10 42 122 42 16rFEFF 10 )).
+	bytes := text utf8Encoded.
+	fromWide := CMark parse: text.
+	fromBytes := CMark parse: bytes.
+	self assert: fromBytes sanitised isNil.
+	self assert: fromBytes sourceString equals: text.
+	self assert: fromBytes firstChild sourceText equals: '# Hi'.
+	self assert: (self nodesOf: CMarkText in: fromBytes) first sourceText equals: 'Hi'.
+	self assert: (fromBytes children at: 2) sourceText equals: (self stringOf: #( 120 16rFEFF 121 )).
+	self assert: (fromBytes children at: 2) firstChild literal equals: (self stringOf: #( 120 16rFEFF 121 )).
+	self assert: (self nodesOf: CMarkEmph in: fromBytes) first sourceText equals: '*z*'.
+	self assert: fromBytes treeString equals: fromWide treeString.
+	self assert: (fromBytes allNodes collect: [ :each | each sourceText ]) equals: (fromWide allNodes collect: [ :each | each sourceText ]).
+	"and after an invalid byte, in the sanitised bytes"
+	fromBytes := CMark parse: #[ 16rEF 16rBB 16rBF 16rFF 35 32 72 105 10 ].
+	self assert: fromBytes sanitised notNil.
+	self assert: fromBytes sourceString equals: (self stringOf: #( 16rFEFF 16rFFFD 35 32 72 105 10 )).
+	self assert: fromBytes firstChild sourceText equals: (self stringOf: #( 16rFFFD 35 32 72 105 ))
 ]
 
 { #category : 'tests' }

@@ -1,5 +1,5 @@
 "
-I test the node API without the plugin: building by hand, navigation, the iterative walks, plainText, printing, treeString, the table cells, the anchors of the headings, the constructors, and the cmarkSource and cmarkFailed extensions.
+I test the node API without the plugin: building by hand, navigation, the iterative walks, plainText, printing, treeString, the table cells, the anchors of the headings, the constructors, and the cmarkSource, cmarkFailed and cmarkUtf8Decoded extensions.
 "
 Class {
 	#name : 'CMarkNodeTest',
@@ -118,6 +118,34 @@ CMarkNodeTest >> testCmarkSource [
 	self should: [ nil cmarkSource ] raise: CMarkError.
 	self should: [ Object new cmarkSource ] raise: CMarkError.
 	self should: [ (WordArray new: 2) cmarkSource ] raise: CMarkError
+]
+
+{ #category : 'tests' }
+CMarkNodeTest >> testCmarkUtf8Decoded [
+	"UTF-8 decoded like utf8Decoded, but every U+FEFF kept (Zinc drops them, and raises on one at the end)"
+
+	| bom wide |
+	bom := Character value: 16rFEFF.
+	self assert: #[ 16rEF 16rBB 16rBF 66 ] cmarkUtf8Decoded equals: (String with: bom with: $B).
+	self
+		assert: #[ 16rEF 16rBB 16rBF 16rEF 16rBB 16rBF 65 16rEF 16rBB 16rBF 66 16rEF 16rBB 16rBF ] cmarkUtf8Decoded
+		equals: (String with: bom with: bom with: $A with: bom) , (String with: $B with: bom).
+	self assert: #[ 16rEF 16rBB 16rBF ] cmarkUtf8Decoded equals: (String with: bom).
+	"no mark: utf8Decoded itself, a ByteString when it fits"
+	self assert: #[ 97 98 ] cmarkUtf8Decoded equals: 'ab'.
+	self assert: #[ 97 98 ] cmarkUtf8Decoded class identicalTo: ByteString.
+	self assert: #[ 16rC3 16rA9 ] cmarkUtf8Decoded equals: (self stringOf: #( 233 )).
+	self assert: #[ 16rC3 16rA9 ] cmarkUtf8Decoded class identicalTo: ByteString.
+	self assert: #[  ] cmarkUtf8Decoded equals: ''.
+	"EF that starts another character (U+FF46, U+FEFE, U+FFBF)"
+	self assert: #[ 16rEF 16rBD 16r86 16rEF 16rBB 16rBE 16rEF 16rBE 16rBF 16rEF 16rBB 16rBF ] cmarkUtf8Decoded equals: (self stringOf: #( 16rFF46 16rFEFE 16rFFBF 16rFEFF )).
+	"a round trip of every kind of character, with the marks anywhere"
+	wide := self stringOf: #( 16rFEFF 97 16rFEFF 233 16r2713 16rFEFF 16rFEFF 16r1F600 10 16rFEFF ).
+	self assert: wide utf8Encoded cmarkUtf8Decoded equals: wide.
+	"bytes that are not UTF-8 still raise"
+	self should: [ #[ 16rEF 16rBB ] cmarkUtf8Decoded ] raise: ZnCharacterEncodingError.
+	self should: [ #[ 16rC3 16rEF 16rBB 16rBF ] cmarkUtf8Decoded ] raise: ZnCharacterEncodingError.
+	self should: [ #[ 16rEF 16rBB 16rBF 16rFF ] cmarkUtf8Decoded ] raise: ZnCharacterEncodingError
 ]
 
 { #category : 'tests' }
@@ -252,7 +280,7 @@ CMarkNodeTest >> testExtensionsArePrefixed [
 
 	| methods |
 	methods := CMarkNode package extensionMethods.
-	self assert: (methods collect: [ :each | each selector ]) asSet equals: #( #cmarkFailed #cmarkSource ) asSet.
+	self assert: (methods collect: [ :each | each selector ]) asSet equals: #( #cmarkFailed #cmarkSource #cmarkUtf8Decoded ) asSet.
 	self assert: (methods collect: [ :each | each methodClass name ]) asSet equals: #( #ProtoObject #String #ByteString #WideString #ByteArray #Text ) asSet
 ]
 

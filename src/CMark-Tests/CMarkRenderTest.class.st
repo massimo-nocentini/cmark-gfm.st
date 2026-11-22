@@ -40,7 +40,14 @@ CMarkRenderTest >> testByteArrays [
 	self assert: bytes equals: ('<h1>' , check , '</h1>' , String lf) utf8Encoded.
 	self assert: (CMark html: #[ 35 32 72 105 ]) equals: '<h1>Hi</h1>' , String lf.
 	"an invalid byte is rendered as U+FFFD"
-	self assert: (CMark html: #[ 97 16rFF ]) equals: '<p>a' , (String with: (Character value: 16rFFFD)) , '</p>' , String lf
+	self assert: (CMark html: #[ 97 16rFF ]) equals: '<p>a' , (String with: (Character value: 16rFFFD)) , '</p>' , String lf.
+	"a U+FEFF of the output is kept"
+	self
+		assert: (CMark html: 'x' , String lf , String lf , (self stringOf: #( 16rFEFF 121 16rFEFF )))
+		equals: '<p>x</p>' , String lf , '<p>' , (self stringOf: #( 16rFEFF 121 16rFEFF )) , '</p>' , String lf.
+	self
+		assert: (CMark render: (self stringOf: #( 120 16rFEFF )) format: #commonmark options: CMarkOptions gfm)
+		equals: (self stringOf: #( 120 16rFEFF 10 ))
 ]
 
 { #category : 'tests' }

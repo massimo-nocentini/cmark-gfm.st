@@ -145,6 +145,37 @@ CMarkDecoderTest >> testClassMapHasOnlyOwners [
 ]
 
 { #category : 'tests' }
+CMarkDecoderTest >> testByteOrderMarks [
+	"A U+FEFF in a ByteArray source (the plugin counts it, a leading one too) and in a string of the tape is kept"
+
+	| bom b p1 p2 t2 doc |
+	bom := Character value: 16rFEFF.
+	b := self builder.
+	b source: ((String with: bom with: $a with: Character lf with: Character lf) , (String with: bom with: $b)) utf8Encoded.
+	p1 := b add: 16r8008 parent: 1.
+	b at: p1 line: 1 column: 4 toLine: 1 column: 4; at: p1 from: 2 to: 2.
+	b at: (b add: 16rC001 parent: p1 str1: 'a') line: 1 column: 4 toLine: 1 column: 4.
+	b at: 3 from: 2 to: 2.
+	p2 := b add: 16r8008 parent: 1.
+	b at: p2 line: 3 column: 1 toLine: 3 column: 4; at: p2 from: 5 to: 6.
+	t2 := b add: 16rC001 parent: p2 str1: (String with: bom with: $b).
+	b at: t2 line: 3 column: 1 toLine: 3 column: 4; at: t2 from: 5 to: 6.
+	doc := b decode.
+	self assert: doc sourceString size equals: 6.
+	self assert: doc sourceString first equals: bom.
+	self assert: doc firstChild sourceText equals: 'a'.
+	self assert: doc firstChild firstChild sourceText equals: 'a'.
+	self assert: doc lastChild sourceText equals: (String with: bom with: $b).
+	self assert: doc lastChild firstChild literal equals: (String with: bom with: $b).
+	self assert: doc lastChild firstChild sourceText equals: doc lastChild firstChild literal.
+	"the sanitised bytes keep it too"
+	b := self builder.
+	b source: #[ 16rEF 16rBB 16rBF 16rFF 97 ].
+	b sanitised: #[ 16rEF 16rBB 16rBF 16rEF 16rBF 16rBD 97 ].
+	self assert: b decode sourceString equals: (self stringOf: #( 16rFEFF 16rFFFD 97 ))
+]
+
+{ #category : 'tests' }
 CMarkDecoderTest >> testCodeBlocks [
 	| b f i doc fenced indented |
 	b := self builder.

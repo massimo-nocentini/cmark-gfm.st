@@ -47,11 +47,11 @@ CMarkDocument >> acceptCMarkVisitor: aVisitor [
 
 { #category : 'private' }
 CMarkDocument >> cmarkDecodeSourceString [
-	"The source as a String, decoded from UTF-8 for a ByteArray (from the sanitised bytes when the plugin answered them); bytes that are not UTF-8 in a hand-built document decode as Latin-1"
+	"The source as a String, decoded from UTF-8 for a ByteArray (from the sanitised bytes when the plugin answered them), keeping every U+FEFF, which the plugin counts; bytes that are not UTF-8 in a hand-built document decode as Latin-1"
 
 	source ifNil: [ ^ nil ].
 	source isString ifTrue: [ ^ source ].
-	^ [ (sanitised ifNil: [ source ]) utf8Decoded ]
+	^ [ (sanitised ifNil: [ source ]) cmarkUtf8Decoded ]
 		  on: ZnCharacterEncodingError
 		  do: [ :e | source asString ]
 ]
