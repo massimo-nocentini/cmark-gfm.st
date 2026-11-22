@@ -809,10 +809,32 @@ CMarkRoassalRenderer >> stackedBlock: aNode children: aCollection context: aCont
 ]
 
 { #category : 'tables' }
+CMarkRoassalRenderer >> tableBlock: aNode rowBlocks: aCollection widths: widths min: minWidths max: maxWidths [
+	"The block of aNode made of the blocks of its rows: a row rendered alone answers its own block, a table (even of one row) wraps them in its own"
+
+	| shapes y |
+	(aCollection size = 1 and: [ aCollection first shape model == aNode ]) ifTrue: [ ^ aCollection first ].
+	shapes := OrderedCollection new.
+	y := 0.
+	aCollection do: [ :each |
+		each shape translateBy: 0 @ y.
+		shapes add: each shape.
+		y := y + each height ].
+	^ self
+		  block: aNode
+		  shapes: shapes
+		  width: (widths inject: 0 into: [ :sum :each | sum + each ])
+		  height: y
+		  baseline: (aCollection ifEmpty: [ fonts ascentOf: context baseStyle ] ifNotEmpty: [ aCollection first firstBaseline ])
+		  natural: (maxWidths inject: 0 into: [ :sum :each | sum + each ])
+		  min: (minWidths inject: 0 into: [ :sum :each | sum + each ])
+]
+
+{ #category : 'tables' }
 CMarkRoassalRenderer >> tableBlock: aNode rows: aCollection alignments: anArray [
 	"The block of aNode, a table (or a row alone), of the rows of aCollection: an automatic layout of the columns"
 
-	| columns cellCount flows minWidths maxWidths widths rowBlocks shapes y bodyIndex |
+	| columns cellCount flows minWidths maxWidths widths rowBlocks bodyIndex |
 	columns := aCollection inject: anArray size into: [ :max :each | max max: each children size ].
 	cellCount := aCollection inject: 0 into: [ :sum :each | sum + each children size ].
 	cellCount > theme maxTableCells ifTrue: [
@@ -844,36 +866,23 @@ CMarkRoassalRenderer >> tableBlock: aNode rows: aCollection alignments: anArray 
 	maxWidths := maxWidths collect: [ :each | each + (2 * theme cellPadding x) ].
 	widths := self tableWidthsMin: minWidths max: maxWidths width: context availableWidth.
 	bodyIndex := 0.
-	rowBlocks := aCollection withIndexCollect: [ :row :r |
-		             | color |
-		             color := row isHeader
-			                      ifTrue: [ theme tableHeaderBackground ]
-			                      ifFalse: [
-				                      bodyIndex := bodyIndex + 1.
-				                      bodyIndex even
-					                      ifTrue: [ theme tableZebra ]
-					                      ifFalse: [ theme background ] ].
-		             self
-			             tableRowBlock: row
-			             flows: (flows at: r)
-			             widths: widths
-			             color: color
-			             alignments: anArray ].
-	rowBlocks size = 1 ifTrue: [ ^ rowBlocks first ].
-	shapes := OrderedCollection new.
-	y := 0.
-	rowBlocks do: [ :each |
-		each shape translateBy: 0 @ y.
-		shapes add: each shape.
-		y := y + each height ].
-	^ self
-		  block: aNode
-		  shapes: shapes
-		  width: (widths inject: 0 into: [ :sum :each | sum + each ])
-		  height: y
-		  baseline: (rowBlocks ifEmpty: [ fonts ascentOf: context baseStyle ] ifNotEmpty: [ rowBlocks first firstBaseline ])
-		  natural: (maxWidths inject: 0 into: [ :sum :each | sum + each ])
-		  min: (minWidths inject: 0 into: [ :sum :each | sum + each ])
+	rowBlocks := OrderedCollection new.
+	aCollection doWithIndex: [ :row :r |
+		| color |
+		color := row isHeader
+			         ifTrue: [ theme tableHeaderBackground ]
+			         ifFalse: [
+				         bodyIndex := bodyIndex + 1.
+				         bodyIndex even
+					         ifTrue: [ theme tableZebra ]
+					         ifFalse: [ theme background ] ].
+		rowBlocks add: (self
+				 tableRowBlock: row
+				 flows: (flows at: r)
+				 widths: widths
+				 color: color
+				 alignments: anArray) ].
+	^ self tableBlock: aNode rowBlocks: rowBlocks widths: widths min: minWidths max: maxWidths
 ]
 
 { #category : 'tables' }

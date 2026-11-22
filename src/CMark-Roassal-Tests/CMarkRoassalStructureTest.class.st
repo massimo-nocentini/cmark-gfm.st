@@ -93,6 +93,24 @@ CMarkRoassalStructureTest >> testHandBuiltInvariants [
 ]
 
 { #category : 'tests' }
+CMarkRoassalStructureTest >> testHeaderOnlyTable [
+	"A table of its header row alone (valid GFM) still has its own composite and frame; its row rendered alone is the row's block"
+
+	| table shape |
+	table := CMarkTable alignments: #( nil #right ).
+	table addChild: (CMarkTableHeaderRow with: {
+				 (CMarkTableCell with: { (self text: 'Name') }).
+				 (CMarkTableCell with: { (self text: 'Value') }) }).
+	self assertInvariantsOf: (self document: { table }).
+	shape := self render: table.
+	self assert: shape model identicalTo: table.
+	self assert: ((self framesOf: shape) count: [ :each | each model == table ]) equals: 1.
+	shape := self render: table children first.
+	self assert: shape model identicalTo: table children first.
+	self assert: ((self framesOf: shape) count: [ :each | each model == table ]) equals: 0
+]
+
+{ #category : 'tests' }
 CMarkRoassalStructureTest >> testNodesWithContentAlone [
 	"Non-empty nodes rendered alone keep the invariants of a block"
 
