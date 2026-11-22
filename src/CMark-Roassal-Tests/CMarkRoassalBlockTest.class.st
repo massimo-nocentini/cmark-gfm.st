@@ -217,6 +217,20 @@ CMarkRoassalBlockTest >> testHtmlImage [
 ]
 
 { #category : 'tests' }
+CMarkRoassalBlockTest >> testHtmlLiteralWraps [
+	"#literal raw HTML breaks its lines by characters at the available width: it never overflows"
+
+	| doc theme shape |
+	doc := self document: { (CMarkHtmlBlock literal: '<div class="note">' , (String new: 40 withAll: $w) , ' and some words of a long line of raw HTML that has to wrap</div>' , String lf) }.
+	theme := CMarkRoassalTheme default htmlStyle: #literal; yourself.
+	renderer := (CMarkRoassalRenderer theme: theme) maxWidth: 320; yourself.
+	shape := renderer render: doc.
+	self assert: shape encompassingRectangle width <= (320 + (2 * theme padding) + 0.01).
+	self assert: (self lineTopsOf: shape) size > 2.
+	self assert: ('' join: (self texts: shape)) equals: (doc children first literal copyWithout: Character lf)
+]
+
+{ #category : 'tests' }
 CMarkRoassalBlockTest >> testImageFromBaseDirectory [
 	self withTemporaryDirectory: [ :dir |
 		| image doc shape bitmaps wide |

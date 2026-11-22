@@ -522,11 +522,14 @@ CMarkRoassalRenderer >> htmlBlockHide: aHtmlBlock [
 
 { #category : 'html' }
 CMarkRoassalRenderer >> htmlBlockLiteral: aHtmlBlock [
-	"The raw HTML as muted mono lines"
+	"The raw HTML as muted mono lines, broken by characters at the available width (unlike code, raw HTML never overflows)"
 
+	| style lines |
+	style := self monoStyleFrom: (context baseStyle withColor: theme mutedColor).
+	lines := aHtmlBlock literal lines collect: [ :each | self singleLine: (self expandTabs: each) trimRight ].
 	^ self
-		  linesBlock: (aHtmlBlock literal lines collect: [ :each | (self expandTabs: each) trimRight ])
-		  style: (self monoStyleFrom: (context baseStyle withColor: theme mutedColor))
+		  linesBlock: (self codeLines: lines style: style width: context availableWidth)
+		  style: style
 		  node: aHtmlBlock
 ]
 
