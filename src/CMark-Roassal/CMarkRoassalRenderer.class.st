@@ -28,7 +28,8 @@ Class {
 		'targets',
 		'skipped',
 		'hardBreaks',
-		'markerColumns'
+		'markerColumns',
+		'footnoteColumns'
 	],
 	#category : 'CMark-Roassal-Rendering',
 	#package : 'CMark-Roassal',
@@ -76,6 +77,7 @@ CMarkRoassalRenderer >> beginRendering: aNode [
 	skipped := 0.
 	targets := IdentityDictionary new.
 	markerColumns := IdentityDictionary new.
+	footnoteColumns := IdentityDictionary new.
 	footnotes := IdentityDictionary new.
 	popup := RSPopup text: [ :model | model cmarkRoassalPopupText ].
 	document := aNode root.
@@ -459,6 +461,24 @@ CMarkRoassalRenderer >> fonts [
 	^ fonts
 ]
 
+{ #category : 'list markers' }
+CMarkRoassalRenderer >> footnoteColumnOf: aFootnoteDefinition [
+	"The marker column of aFootnoteDefinition and of the definitions beside it: listIndent, or more for wide ordinals; measured once per parent in a rendering"
+
+	| parent |
+	parent := aFootnoteDefinition parent.
+	parent ifNil: [ ^ self footnoteColumnOfAll: { aFootnoteDefinition } ].
+	^ footnoteColumns at: parent ifAbsentPut: [ self footnoteColumnOfAll: (parent children select: [ :each | each isFootnoteDefinition ]) ]
+]
+
+{ #category : 'list markers' }
+CMarkRoassalRenderer >> footnoteColumnOfAll: aCollection [
+	"The marker column of the footnote definitions of aCollection: listIndent, or the widest 'ordinal.' plus markerGap"
+
+	^ theme listIndent max: theme markerGap
+		  + (aCollection inject: 0 into: [ :max :each | max max: (fonts widthOf: each ordinal printString , '.' in: context baseStyle) ])
+]
+
 { #category : 'inline' }
 CMarkRoassalRenderer >> footnoteReferenceRun: aFootnoteReference style: aStyle [
 	"A raised label [n] that follows aFootnoteReference to its definition"
@@ -558,6 +578,7 @@ CMarkRoassalRenderer >> initialize [
 	skipped := 0.
 	targets := IdentityDictionary new.
 	markerColumns := IdentityDictionary new.
+	footnoteColumns := IdentityDictionary new.
 	hardBreaks := false
 ]
 
@@ -1159,12 +1180,8 @@ CMarkRoassalRenderer >> visitEmph: anEmph [
 CMarkRoassalRenderer >> visitFootnoteDefinition: aFootnoteDefinition [
 	"A footnote definition as a list item whose marker is its ordinal"
 
-	| column blocks shapes result baseline height block marker siblings |
-	siblings := aFootnoteDefinition parent
-		            ifNil: [ { aFootnoteDefinition } ]
-		            ifNotNil: [ :parent | parent children select: [ :each | each isFootnoteDefinition ] ].
-	column := theme listIndent max: theme markerGap
-		          + (siblings inject: 0 into: [ :max :each | max max: (fonts widthOf: each ordinal printString , '.' in: context baseStyle) ]).
+	| column blocks shapes result baseline height block marker |
+	column := self footnoteColumnOf: aFootnoteDefinition.
 	blocks := self childBlocksOf: aFootnoteDefinition children in: (context withAvailableWidth: (self width: context availableWidth less: column)) nested.
 	shapes := OrderedCollection new.
 	result := self stack: blocks gap: theme tightGap into: shapes at: column.

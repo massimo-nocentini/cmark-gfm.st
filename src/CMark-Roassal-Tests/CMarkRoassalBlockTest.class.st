@@ -119,6 +119,25 @@ CMarkRoassalBlockTest >> testFontFallback [
 ]
 
 { #category : 'tests' }
+CMarkRoassalBlockTest >> testFootnoteDefinitionsTakeLinearTime [
+	"The marker column of the footnote definitions is measured once, not once per definition: a thousand of them take about the time of a list of a thousand items"
+
+	| n notes list notesTime listTime |
+	n := 1000.
+	notes := self document: ((1 to: n) collect: [ :i |
+			          (CMarkFootnoteDefinition label: i printString)
+				          ordinal: i;
+				          addChild: (self paragraph: { (self text: 'note') });
+				          yourself ]).
+	list := self document: { (self list: (CMarkList ordered: 1) items: ((1 to: n) collect: [ :i | 'note' ])) }.
+	self render: list.
+	listTime := Time millisecondsToRun: [ self render: list ].
+	notesTime := Time millisecondsToRun: [ self render: notes ].
+	self assert: (self texts: (self render: notes)) size equals: 2 * n.
+	self assert: notesTime <= ((5 * listTime) + 250) description: n printString , ' definitions took ' , notesTime printString , ' ms, a list of as many items ' , listTime printString , ' ms'
+]
+
+{ #category : 'tests' }
 CMarkRoassalBlockTest >> testHeadingRules [
 	| shape rules |
 	#( 1 2 3 ) do: [ :level |
