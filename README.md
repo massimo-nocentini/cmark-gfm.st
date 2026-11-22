@@ -45,7 +45,13 @@ doc := CMark parse: aString options: (CMarkOptions commonMark smart: true).
 CMark html: '# Hi'.                              "'<h1>Hi</h1>', LF"
 CMark render: '# Hi' format: #latex.             "#html #xml #commonmark #plaintext #latex #man"
 CMark isAvailable.                               "whether the VM has the CMarkPlugin"
+CMark version.                                   "'0.29.0.gfm.14', or nil without the plugin"
+CMark statistics.                                "the plugin's counters: parses, renders, reused..."
 ```
+
+`CMark` only delegates. `CMarkParser` (`parse:`, `options:`) answers a `CMarkDocument`, and `CMarkFormatter` (`render:`, `renderBytes:`, `format:`, `options:`) renders source text with cmark-gfm's own renderers: `#html`, `#xml`, `#commonmark`, `#plaintext`, `#latex` or `#man`. An unknown format is a `CMarkError`. The formatter takes source text only: there is no CommonMark writer in Smalltalk, so a hand-built tree cannot be rendered this way.
+
+A parse is one call of the plugin. The answer is sized before it is allocated. When it would not fit in the free object memory, `CMarkPrimitives` grows the memory and calls again, and the plugin answers from the result it kept, without parsing again.
 
 A source is a String (a ByteString is Latin-1 and a WideString any Unicode; a Symbol or a Text is converted) or a ByteArray of UTF-8. Bytes that are not valid UTF-8, and NUL, are parsed as U+FFFD. Anything else is a `CMarkError`.
 
@@ -116,6 +122,54 @@ CMarkDocument withAll: {
 ### Errors
 
 Every error of CMark is a `CMarkError`: `CMarkUnavailable` (no plugin, or another protocol), `CMarkInputTooLarge`, `CMarkTooDeep`, `CMarkMemoryLimit` (`reason`: `#budget`, `#block` or `#malloc`), and `CMarkMalformedTree`. When growing the object memory does not make room for an answer, the stock `OutOfMemory` is signalled: it is a VM condition, and `on: CMarkError` does not catch it.
+
+## Rendering with Roassal
+
+The package `CMark-Roassal` (group `Roassal`) draws a node as one `RSComposite` whose model is the node: a document as a page, any other node alone. It uses only the Roassal API that the stock images of Pharo 12 to 15 share, so it needs neither the user's Roassal fork nor the plugin (a hand-built tree draws too).
+
+```smalltalk
+doc := CMark parse: aString options: (CMarkOptions gfm footnotes: true; yourself).
+doc asRoassalShape.                   "an RSComposite, the default theme, 640 wide"
+doc asRoassalShapeWidth: 320.
+doc asRoassalCanvas open.             "an RSCanvas: the camera fits the width and shows the top"
+
+renderer := CMarkRoassalRenderer new
+	theme: CMarkRoassalTheme dark;    "default, dark or compact"
+	maxWidth: 480;
+	baseDirectory: FileLocator imageDirectory asFileReference;   "for relative image URLs"
+	yourself.
+shape := renderer render: doc.
+(renderer canvasFor: doc) open.
+
+CMarkRoassalExporter exportPng: shape to: 'doc.png' asFileReference scale: 2.
+CMarkRoassalExporter exportSvg: shape to: 'doc.svg' asFileReference.
+CMarkRoassalExamples exampleSample.   "also exampleDark, exampleNarrow, exampleTable, exampleTasks, exampleHandBuilt, exampleReadme"
+```
+
+How it lays out:
+- Blocks are stacked composites, each with a transparent frame box as its first child (the hit area, with the node as model). A block composite is never given an explicit extent: Roassal clips the children of a composite to its own rectangle.
+- Paragraphs and headings go through `CMarkInlineFlow`, not `RSFlowLayout`. Lines break only at blanks (space, tab, CR, LF; a no-break space is not one), soft breaks and line breaks, so that `[link](u).` or `**bold**,` never lose their punctuation to the next line. Text is measured by the advance of each character, and the words of one run on a line are one `RSLabel`, so that underlines and strikes are continuous. Every piece of a line sits on one baseline. A code span is a row of chips that may break at its spaces.
+- Tables get an automatic layout: each column gets at least its widest word, and the rest of the width goes to the columns that need it. Lists put their markers on the first baseline of the item (bullets by depth, numbers as written from the list's start, a checkbox with a tick for a checked task). Quotes get a bar, code blocks a rounded box (tabs every 4 columns), footnote definitions come last.
+- Links carry one shared popup (the URL) and a click. A click on `#anchor` or on a footnote reference moves the camera to the heading or the definition; other URLs go to `theme linkAction` (the `WebBrowser` of the image, when there is one).
+
+`CMarkRoassalTheme` holds the fonts (Source Sans Pro and Source Code Pro, else the default family of `RSLabel`, at whole point sizes), sizes, colours and gaps, and:
+- `htmlStyle`: raw HTML is never executed. `#basic` (the default) hides comments, makes `<br>` a line break and `<img src alt>` an image or a placeholder, and strips other tags but keeps their text; `#literal` shows the HTML as muted code; `#hide` drops it.
+- `codeWrap`: `#none` (a long code line widens its box), `#characters` or `#clip`. `breakLongWords` breaks words wider than the column.
+- the caps `maxNesting` (64: deeper blocks are drawn flat, deeper inlines keep their style), `maxShapes` (100,000) and `maxTableCells` (10,000), beyond which a muted placeholder says what is not shown.
+- `imageResolver`: images come from local `.png`, `.jpg`, `.jpeg`, `.gif` and `.bmp` files only, absolute or relative to `baseDirectory:`, never from the network. Images wider than the column are scaled down.
+
+The inspector of a node has a `Rendered` tab (for trees of at most 5000 nodes).
+
+Limits of the view: the fonts of the image only, so CJK characters and emoji are drawn as boxes (no glyph fallback); no syntax highlighting, no math, no selection; GitHub alerts are plain quotes; `codeWrap: #none` code lines, words wider than the column and tables whose words do not fit are the only things wider than `maxWidth`.
+
+## Tests
+
+`CMark-Tests` (99 tests) and `CMark-Roassal-Tests` (64 tests, with golden structural dumps of the rendered fixtures). Without the plugin, the tests that parse skip themselves (43 and 11 of them): the rest covers the decoder on hand-made tapes, the hand-built trees, the visitor, the options and the renderer on hand-built trees. From a checkout of the VM:
+
+```sh
+sh plugins/CMarkPlugin/tests/run-st-tests.sh build/build/vm Pharo.image
+CMARK_GROUPS='Core Tests Roassal RoassalTests' sh plugins/CMarkPlugin/tests/run-st-tests.sh build/build/vm Pharo.image
+```
 
 ## Tree format
 
