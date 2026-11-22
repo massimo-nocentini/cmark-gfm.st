@@ -9,7 +9,7 @@ Every visit answers a CMarkRoassalBlock: an RSComposite whose top-left is its lo
 
 The context of a block (CMarkRoassalContext: available width, base style, list, bullet and quote depths, nesting) is passed down immutable and kept in my context only for one visit.  Inline content is flattened by CMarkInlineRunCollector and laid out by CMarkInlineFlow.  Fonts and measures are cached per rendering by CMarkRoassalFonts and dropped at the end of render:.
 
-Budgets (CMarkRoassalTheme): blocks deeper than maxNesting are rendered flat (their cmarkRoassalFlatText in a muted paragraph); when maxShapes shapes exist, the rest of the document is one muted paragraph 'N more blocks not shown'; a table of more than maxTableCells cells is a placeholder.
+Budgets (CMarkRoassalTheme): blocks deeper than maxNesting are rendered flat (their cmarkRoassalFlatText in a muted paragraph); when maxShapes shapes exist, no more blocks are made, nor lines of code, of raw HTML or of inline text, nor table rows (a block always gets its first line or row), and the page ends with one muted paragraph 'N more blocks not shown', where N counts the blocks left out, the footnote definitions among them, and one for each block cut short; a table of more than maxTableCells cells is a placeholder.
 
 Interactions: every piece inside a link (labels, code chips, images) and every footnote reference shares one RSPopup and has a click subscription made with when:do:for: (never the deprecated when:do:, which rewrites the sender at run time).  A click on an anchor link (#slug) or on a footnote reference moves the camera of the canvas to the heading or the definition; other links go to the linkAction of the theme.  canvasFor: fits the width and shows the top of the document instead of zooming to fit.
 "
@@ -121,6 +121,21 @@ CMarkRoassalRenderer >> boxFrom: aPoint to: anotherPoint color: aColor node: aNo
 		  yourself
 ]
 
+{ #category : 'budgets' }
+CMarkRoassalRenderer >> budgetedLines: aCollection [
+	"The first lines of aCollection that the shape budget still allows, one label each but for the empty ones, and always the first; a block cut short counts as one block not shown"
+
+	| left |
+	left := theme maxShapes - shapeCount max: 1.
+	aCollection doWithIndex: [ :each :i |
+		each isEmpty ifFalse: [
+			left = 0 ifTrue: [
+				self skipBlocks: 1.
+				^ aCollection first: i - 1 ].
+			left := left - 1 ] ].
+	^ aCollection
+]
+
 { #category : 'list markers' }
 CMarkRoassalRenderer >> bulletCircle: aSize color: aColor [
 	^ RSEllipse new
@@ -227,8 +242,8 @@ CMarkRoassalRenderer >> childBlocksOf: aCollection in: aContext [
 	| blocks |
 	blocks := OrderedCollection new.
 	aCollection doWithIndex: [ :each :i |
-		shapeCount >= theme maxShapes ifTrue: [
-			skipped := skipped + (aCollection size - i + 1).
+		self isOverBudget ifTrue: [
+			self skipBlocks: aCollection size - i + 1.
 			^ blocks ].
 		blocks add: (self blockFor: each in: aContext) ].
 	^ blocks
@@ -592,6 +607,13 @@ CMarkRoassalRenderer >> inlineBlock: anInlineNode [
 	^ self flowBlockFor: { anInlineNode } style: context baseStyle node: anInlineNode
 ]
 
+{ #category : 'budgets' }
+CMarkRoassalRenderer >> isOverBudget [
+	"Whether the shapes made so far reached maxShapes: the blocks, lines and table rows that follow are not shown"
+
+	^ shapeCount >= theme maxShapes
+]
+
 { #category : 'lists' }
 CMarkRoassalRenderer >> itemBlock: anItem [
 	"The block of anItem: the marker column, then its children; the marker sits on the first baseline"
@@ -648,13 +670,14 @@ CMarkRoassalRenderer >> lines: aCollection left: aLeft top: aTop lineHeight: aLi
 
 { #category : 'code' }
 CMarkRoassalRenderer >> linesBlock: aCollection style: aStyle node: aNode [
-	"The lines of aCollection, one label each (none for an empty line), without a box"
+	"The lines of aCollection, one label each (none for an empty line), without a box, as many as the shape budget allows"
 
-	| shapes lineHeight y |
+	| lines shapes lineHeight y |
+	lines := self budgetedLines: aCollection.
 	shapes := OrderedCollection new.
 	lineHeight := fonts heightOf: aStyle.
 	y := 0.
-	aCollection do: [ :each |
+	lines do: [ :each |
 		each isEmpty ifFalse: [
 			| label |
 			label := self labelFor: each style: aStyle node: aNode.
@@ -667,7 +690,7 @@ CMarkRoassalRenderer >> linesBlock: aCollection style: aStyle node: aNode [
 		  width: context availableWidth
 		  height: y
 		  baseline: (fonts ascentOf: aStyle)
-		  natural: (aCollection inject: 0 into: [ :max :each | max max: (fonts widthOf: each in: aStyle) ])
+		  natural: (lines inject: 0 into: [ :max :each | max max: (fonts widthOf: each in: aStyle) ])
 		  min: 0
 ]
 
@@ -757,6 +780,7 @@ CMarkRoassalRenderer >> mutedParagraph: aString node: aNode [
 				         style: (context baseStyle withColor: theme mutedColor)
 				         node: aNode) }
 		        baseStyle: context baseStyle.
+	flow budgeted: false.
 	flow layoutWidth: context availableWidth alignment: #left.
 	^ flow
 ]
@@ -804,6 +828,13 @@ CMarkRoassalRenderer >> singleLine: aString [
 		  (each = Character tab or: [ each = Character cr or: [ each = Character lf ] ])
 			  ifTrue: [ Character space ]
 			  ifFalse: [ each ] ]
+]
+
+{ #category : 'budgets' }
+CMarkRoassalRenderer >> skipBlocks: anInteger [
+	"Count anInteger more blocks (or rests of blocks cut short) as not shown"
+
+	skipped := skipped + anInteger
 ]
 
 { #category : 'blocks' }
@@ -903,6 +934,9 @@ CMarkRoassalRenderer >> tableBlock: aNode rows: aCollection alignments: anArray 
 	rowBlocks := OrderedCollection new.
 	aCollection doWithIndex: [ :row :r |
 		| color |
+		(r > 1 and: [ self isOverBudget ]) ifTrue: [
+			self skipBlocks: 1.
+			^ self tableBlock: aNode rowBlocks: rowBlocks widths: widths min: minWidths max: maxWidths ].
 		color := row isHeader
 			         ifTrue: [ theme tableHeaderBackground ]
 			         ifFalse: [
@@ -1095,6 +1129,7 @@ CMarkRoassalRenderer >> visitCodeBlock: aCodeBlock [
 	pad := theme codePadding.
 	lines := aCodeBlock lines collect: [ :each | self singleLine: (self expandTabs: each) trimRight ].
 	theme codeWrap = #characters ifTrue: [ lines := self codeLines: lines style: style width: width - (2 * pad) ].
+	lines := self budgetedLines: lines.
 	widths := lines collect: [ :each |
 		          each isEmpty
 			          ifTrue: [ 0 ]
@@ -1163,6 +1198,8 @@ CMarkRoassalRenderer >> visitDocument: aDocument [
 	result := self stack: blocks gap: theme blockGap into: content at: 0.
 	y := result first.
 	baseline := result second.
+	"the definitions follow the whole body only: when the budget cut it, they count as not shown"
+	(definitions notEmpty and: [ skipped > 0 ]) ifTrue: [ self skipBlocks: definitions size ].
 	(definitions notEmpty and: [ skipped = 0 ]) ifTrue: [
 		| definitionBlocks definitionShapes |
 		definitionBlocks := self

@@ -292,6 +292,52 @@ CMarkRoassalBlockTest >> testMaxShapes [
 ]
 
 { #category : 'tests' }
+CMarkRoassalBlockTest >> testMaxShapesCountsTheFootnotes [
+	"The footnote definitions that the shape budget leaves out are counted with the other blocks"
+
+	| definition reference doc shape texts shown |
+	definition := (CMarkFootnoteDefinition label: 'n')
+		              ordinal: 1;
+		              yourself.
+	definition addChild: (self paragraph: { (self text: 'the note') }).
+	reference := CMarkFootnoteReference new
+		             ordinal: 1;
+		             yourself.
+	definition addReference: reference.
+	doc := self document: ((1 to: 7) collect: [ :i | self paragraph: { (self text: 'p' , i printString) } ]) , { definition }.
+	doc children first addChild: reference.
+	shape := self render: doc theme: (CMarkRoassalTheme default maxShapes: 10; yourself).
+	texts := self texts: shape.
+	shown := (texts select: [ :each | each first = $p ]) size.
+	self assert: shown < 7.
+	self deny: (texts includes: 'the note').
+	self assert: texts last equals: (7 - shown + 1) printString , ' more blocks not shown'
+]
+
+{ #category : 'tests' }
+CMarkRoassalBlockTest >> testMaxShapesInsideABlock [
+	"The shape budget also holds inside one block: a long code block, a long paragraph and a long table stop near maxShapes; each counts as one block cut short"
+
+	| code paragraph table blocks |
+	code := CMarkCodeBlock literal: (String streamContents: [ :stream | 1 to: 5000 do: [ :i | stream nextPutAll: 'line '; print: i; lf ] ]) info: ''.
+	paragraph := self paragraph: ((1 to: 5000) inject: OrderedCollection new into: [ :all :i |
+			              all
+				              add: (self text: 'line ' , i printString);
+				              add: CMarkLineBreak new;
+				              yourself ]).
+	table := CMarkTable alignments: #( nil ).
+	1 to: 2000 do: [ :i | table addChild: (CMarkTableRow with: { (CMarkTableCell with: { (self text: 'row ' , i printString) }) }) ].
+	blocks := { code. paragraph. table }.
+	blocks do: [ :each |
+		| shape texts |
+		shape := self render: (self document: { each. (self paragraph: { (self text: 'after') }) }) theme: (CMarkRoassalTheme default maxShapes: 1000; yourself).
+		self assert: renderer shapeCount <= 1030 description: each typeName , ': ' , renderer shapeCount printString , ' shapes'.
+		texts := self texts: shape.
+		self assert: texts last equals: '2 more blocks not shown'.
+		self assert: (texts includes: 'after') not ]
+]
+
+{ #category : 'tests' }
 CMarkRoassalBlockTest >> testMaxTableCells [
 	| table doc shape |
 	table := CMarkTable alignments: #( nil nil nil ).

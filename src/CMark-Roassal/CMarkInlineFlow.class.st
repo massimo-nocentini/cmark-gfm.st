@@ -6,6 +6,7 @@ I lay out the inline content of one block (the CMarkInlineRuns of CMarkInlineRun
 3. Greedy breaking: a cluster moves to the next line when it does not fit and the line is not empty.  An overlong cluster overflows, or breaks by characters when the theme says breakLongWords.
 4. On a line, consecutive words of the same run merge into one RSLabel (continuous underline and strike, far fewer shapes), and consecutive segments of one code span share one chip box (rounded and padded only at the ends of the span).  No label is ever made of an empty string.
 5. Each line takes the largest ascent and descent of its pieces (and of the base font, so an empty line has the height of a line of the base font); every piece sits on the common baseline.  Lines are lineGap apart.  Lines are aligned left, centred or right (table cells).
+6. The shape budget of the renderer (maxShapes) cuts my lines: once it is spent, no line after the first is made, and the renderer counts the block as cut short (budgeted: false exempts the messages of the budgets).
 
 After layoutWidth:alignment:node: I answer my shapes (in local coordinates, the top-left of the first line at 0@0), my height, the y of my first baseline, the number and widths of my lines.  naturalWidth (the width of the widest line at an unlimited width) and minWidth (the widest cluster) need no layout: tables ask them first.
 "
@@ -25,7 +26,8 @@ Class {
 		'shapes',
 		'height',
 		'firstBaseline',
-		'lineWidths'
+		'lineWidths',
+		'budgeted'
 	],
 	#category : 'CMark-Roassal-Inline',
 	#package : 'CMark-Roassal',
@@ -214,6 +216,13 @@ CMarkInlineFlow >> alignmentOffset: anAlignment width: aWidth line: aLineWidth [
 	^ 0
 ]
 
+{ #category : 'accessing' }
+CMarkInlineFlow >> budgeted: aBoolean [
+	"Whether the shape budget of the renderer may cut my lines (true unless set: the messages of the budgets themselves are shown whole)"
+
+	budgeted := aBoolean
+]
+
 { #category : 'building' }
 CMarkInlineFlow >> buildClusters [
 	clusters := OrderedCollection new.
@@ -225,6 +234,8 @@ CMarkInlineFlow >> buildClusters [
 
 { #category : 'layout' }
 CMarkInlineFlow >> buildShapesWidth: aWidth alignment: anAlignment [
+	"Make the shapes of my lines while the shape budget of the renderer lasts (the first line always): after a cut my other lines are dropped, and the renderer counts the block as cut short"
+
 	| baseAscent baseDescent y |
 	shapes := OrderedCollection new.
 	lineWidths := OrderedCollection new.
@@ -234,6 +245,12 @@ CMarkInlineFlow >> buildShapesWidth: aWidth alignment: anAlignment [
 	firstBaseline := nil.
 	lines doWithIndex: [ :line :i |
 		| groups ascent descent lineWidth dx |
+		(i > 1 and: [ budgeted and: [ renderer isOverBudget ] ]) ifTrue: [
+			renderer skipBlocks: 1.
+			lines := lines first: i - 1.
+			height := y.
+			^ self ].
+		i > 1 ifTrue: [ y := y + renderer theme lineGap ].
 		groups := self groupsOf: line.
 		ascent := baseAscent.
 		descent := baseDescent.
@@ -252,8 +269,7 @@ CMarkInlineFlow >> buildShapesWidth: aWidth alignment: anAlignment [
 				with: y + ascent ].
 		firstBaseline ifNil: [ firstBaseline := y + ascent ].
 		lineWidths add: lineWidth.
-		y := y + ascent + descent.
-		i < lines size ifTrue: [ y := y + renderer theme lineGap ] ].
+		y := y + ascent + descent ].
 	height := y
 ]
 
@@ -458,6 +474,7 @@ CMarkInlineFlow >> setRenderer: aRenderer runs: aCollection baseStyle: aStyle [
 	fonts := aRenderer fonts.
 	runs := aCollection.
 	baseStyle := aStyle.
+	budgeted := true.
 	self buildClusters
 ]
 
