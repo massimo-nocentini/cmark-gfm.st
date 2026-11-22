@@ -178,7 +178,7 @@ CMARK_GROUPS='Core Tests Roassal RoassalTests' sh plugins/CMarkPlugin/tests/run-
 ## Limitations
 
 - The positions are cmark's own. Columns count bytes, and the soft and line breaks have none.
-- cmark-gfm 0.29.0.gfm.14 is used without patches. With `footnotes: true`, a footnote label that contains an inline (``[^a<b>c]``) is cut short, and the dropped text disappears from the document: an upstream regression of gfm.14. Footnotes are therefore off by default. The XML render of a footnote is not well-formed (`<<unknown> />`). Angle autolinks (`<https://x.y>`) get wrong columns, which the plugin clamps (`isClamped`).
+- cmark-gfm 0.29.0.gfm.14 is used without patches. With `footnotes: true`, a footnote label that contains an inline (``[^a<b>c]``) is cut short, and the dropped text disappears from the document: an upstream regression of gfm.14. Footnotes are therefore off by default. The XML render of a footnote is not well-formed (`<<unknown> />`). Angle autolinks (`<https://x.y>`) get wrong columns, which the plugin clamps (`isClamped`). In a table cell, the inlines after an escaped pipe (`\|`) start and end one column early per escaped pipe before them; those columns stay inside the line, so they are not clamped and their `sourceText` is off.
 - GitHub alerts (`> [!NOTE]`) are GitHub post-processing: cmark parses them as plain block quotes.
 - A parse is one primitive call: the VM does nothing else while it runs.
 

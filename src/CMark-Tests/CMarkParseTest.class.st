@@ -334,6 +334,27 @@ CMarkParseTest >> testKnownFootnoteLabelBug [
 ]
 
 { #category : 'tests' }
+CMarkParseTest >> testKnownEscapedPipeBug [
+	"Known gfm.14 behaviour (upstream's --sourcepos gives the same columns): the inlines of a table cell after an escaped pipe start and end one column early per escaped pipe before them, inside the line, so they are not clamped; the cell itself is right"
+
+	| doc cell texts emph |
+	doc := CMark parse: (CMarkFixtures lines: #( '| a | b |' '|---|---|' '| x \| y *e* | z |' )).
+	cell := doc firstChild children last firstChild.
+	self assert: cell sourceText equals: ' x \| y *e* '.
+	texts := self nodesOf: CMarkText in: cell.
+	self assert: texts first literal equals: 'x | y '.
+	self assert: texts first sourceText equals: 'x \| y'.
+	emph := (self nodesOf: CMarkEmph in: cell) first.
+	self assert: emph startByteColumn equals: 9.
+	self assert: emph endByteColumn equals: 11.
+	self deny: emph isClamped.
+	self assert: emph sourceText equals: ' *e'.
+	self assert: emph firstChild sourceText equals: '*'.
+	"the cell after it is right"
+	self assert: (self nodesOf: CMarkText in: doc firstChild children last) last sourceText equals: 'z'
+]
+
+{ #category : 'tests' }
 CMarkParseTest >> testLatin1 [
 	| source doc emph |
 	source := 'Caf' , (String with: (Character value: 233)) , ' *' , (String with: (Character value: 255)) , '* ' , (String with: (Character value: 128)).

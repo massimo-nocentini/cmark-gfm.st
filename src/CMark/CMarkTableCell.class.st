@@ -1,5 +1,7 @@
 "
 I am a cell of a table row: my children are inlines.  column (my index in my row) and alignment (from my table) are computed, so hand-built cells have them too.  isAutocompleted says whether cmark padded a short row with me: I then have no children and no position.
+
+Known gfm.14 behaviour (docs/CMark.md, Limitations): the table extension unescapes each \| of my text before it parses my inlines, and keeps their offsets, so the inlines after an escaped pipe start (and end) one column early per \| before them, and their sourceText is wrong.  The positions stay inside the line, so the plugin does not clamp them (isClamped is false); my own position is right.
 "
 Class {
 	#name : 'CMarkTableCell',

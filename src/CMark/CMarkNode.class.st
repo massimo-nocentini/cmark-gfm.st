@@ -421,7 +421,7 @@ CMarkNode >> isBlock [
 
 { #category : 'testing' }
 CMarkNode >> isClamped [
-	"Whether the plugin clamped one of my positions, which pointed outside the source (the angle autolinks of gfm.14, docs/CMark.md, Limitations)"
+	"Whether the plugin clamped one of my positions, which pointed outside the source (the angle autolinks of gfm.14, docs/CMark.md, Limitations); a wrong position inside the line, such as those of the inlines after an escaped pipe in a table cell (see CMarkTableCell), is not clamped"
 
 	^ self cmarkHasFlag: CMarkTreeDecoder flagClamped
 ]
