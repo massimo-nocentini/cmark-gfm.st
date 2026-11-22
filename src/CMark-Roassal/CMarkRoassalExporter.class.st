@@ -4,7 +4,7 @@ I export a rendering (an RSComposite of CMarkRoassalRenderer, any shape, or an R
 	CMarkRoassalExporter exportPng: (CMark parse: text) asRoassalShape to: 'doc.png' asFileReference scale: 2.
 	CMarkRoassalExporter exportSvg: aCanvas to: 'doc.svg' asFileReference.
 
-A shape that is in no canvas is put in a new one; a shape in a canvas exports its whole canvas.  The picture is the encompassing rectangle of the canvas plus a margin, at the given scale: the camera is centred on it for the export and restored afterwards, with the extent of the canvas.  The SVG has the text as glyph outlines (cairo), images embedded, and is drawn without clearing the background (the clear of cairo would erase it).
+A shape that is in no canvas is put in a new one; a shape in a canvas exports its whole canvas.  The picture is the encompassing rectangle of the canvas plus a margin, at the given scale: the camera is centred on it for the export; afterwards the extent of the canvas is restored, then its camera (a scrolled canvasFor: canvas stays where it was).  The SVG has the text as glyph outlines (cairo), images embedded, and is drawn without clearing the background (the clear of cairo would erase it).
 "
 Class {
 	#name : 'CMarkRoassalExporter',
@@ -26,7 +26,7 @@ CMarkRoassalExporter class >> canvasOf: aShapeOrCanvas [
 
 { #category : 'private' }
 CMarkRoassalExporter class >> drawCanvas: aCanvas scale: aNumber with: aBlock [
-	"Evaluate aBlock with the pixel extent and the morph of aCanvas, its camera centred on its shapes at the scale aNumber; restore the camera and the extent"
+	"Evaluate aBlock with the pixel extent and the morph of aCanvas, its camera centred on its shapes at the scale aNumber; restore the extent, then the camera"
 
 	| rect extent morph savedCamera savedExtent savedMorphExtent |
 	rect := aCanvas encompassingRectangle expandBy: self margin.
@@ -43,9 +43,10 @@ CMarkRoassalExporter class >> drawCanvas: aCanvas scale: aNumber with: aBlock [
 	  aCanvas camera translateTo: (aCanvas camera positionFromSpace: rect floatCenter).
 	  aCanvas invalidate.
 	  aBlock value: extent value: morph ] ensure: [
-		  aCanvas camera: savedCamera.
+		  "the extents first: a new extent may move the camera (canvasFor: fits the width again), which must come back as it was"
 		  morph extent: savedMorphExtent.
-		  savedExtent ifNotNil: [ aCanvas extent: savedExtent ] ]
+		  savedExtent ifNotNil: [ aCanvas extent: savedExtent ].
+		  aCanvas camera: savedCamera ]
 ]
 
 { #category : 'exporting' }

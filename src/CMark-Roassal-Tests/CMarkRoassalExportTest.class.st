@@ -34,6 +34,26 @@ CMarkRoassalExportTest >> testExportHandBuilt [
 ]
 
 { #category : 'tests' }
+CMarkRoassalExportTest >> testExportKeepsAScrolledCamera [
+	"Exporting a canvas of canvasFor: that was scrolled leaves its camera where it was (restoring the extent refits the camera, so the camera comes back last)"
+
+	self requireSurface.
+	self requireCanvas.
+	self withTemporaryDirectory: [ :dir |
+		| canvas scale position |
+		canvas := CMarkRoassalRenderer new canvasFor: CMarkRoassalExamples handBuiltDocument.
+		canvas extent: 400 @ 300.
+		canvas camera translateBy: 0 @ 300.
+		scale := canvas camera scale.
+		position := canvas camera position copy.
+		CMarkRoassalExporter exportPng: canvas to: dir / 'a.png' scale: 1.
+		self assert: (dir / 'a.png') size > 1000.
+		self assert: canvas camera scale equals: scale.
+		self assert: canvas camera position equals: position.
+		self assert: canvas extent equals: 400 @ 300 ]
+]
+
+{ #category : 'tests' }
 CMarkRoassalExportTest >> testExportSample [
 	self assertExportsOf: (self parse: CMarkFixtures sample)
 ]
