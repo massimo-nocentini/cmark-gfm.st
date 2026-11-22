@@ -1,5 +1,5 @@
 "
-I am a footnote definition ([^label]: text), parsed only with the option footnotes: my children are blocks.  label is my label as written, ordinal my number (1-based, in the order of the first references), references the CMarkFootnoteReferences that point at me, in source order.  cmark moves the referenced definitions to the end of the document, sorted by first reference, and drops the others.
+I am a footnote definition ([^label]: text), parsed only with the option footnotes: my children are blocks.  label is my label as written, ordinal my number (1-based, in the order of the first references), references the CMarkFootnoteReferences of the tree that point at me, in source order (cmark's own count, def_count, also counts the references inside the definitions it dropped).  cmark moves the referenced definitions to the end of the document, sorted by first reference, and drops the others.
 "
 Class {
 	#name : 'CMarkFootnoteDefinition',

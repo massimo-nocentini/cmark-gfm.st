@@ -1,5 +1,5 @@
 "
-I am a reference to a footnote ([^label]), parsed only with the option footnotes: ordinal is the number of my definition, definition my CMarkFootnoteDefinition, referenceIndex my rank among the references to it (1 for the first, in source order).  A reference without a definition is the text [^label] instead.
+I am a reference to a footnote ([^label]), parsed only with the option footnotes: ordinal is the number of my definition, definition my CMarkFootnoteDefinition, referenceIndex my rank among the references to it that are in the tree (1 for the first, in source order; see referenceIndex for where it differs from cmark's numbering).  A reference without a definition is the text [^label] instead.
 "
 Class {
 	#name : 'CMarkFootnoteReference',
@@ -77,7 +77,7 @@ CMarkFootnoteReference >> ordinal: anInteger [
 
 { #category : 'accessing' }
 CMarkFootnoteReference >> referenceIndex [
-	"My rank among the references to my definition, 1-based in source order (cmark's ref_ix)"
+	"My rank among the references to my definition that are in the tree, 1-based in source order.  That is cmark's private ref_ix (the n of the id fnref-<label>-<n> of its HTML) unless cmark dropped a definition that held references to my footnote: cmark numbers the references of the whole document before it drops the unreferenced (and the repeated) definitions, so its numbers count references that are not in the tree, and mine do not"
 
 	^ referenceIndex
 ]

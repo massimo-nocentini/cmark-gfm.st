@@ -281,6 +281,22 @@ CMarkParseTest >> testFootnotesMovedOrder [
 ]
 
 { #category : 'tests' }
+CMarkParseTest >> testFootnoteReferencesInDroppedDefinitions [
+	"cmark numbers every reference before it drops the unreferenced definition u: its HTML numbers y's reference 3, while referenceIndex ranks the references of the tree only (pinned, as documented in CMarkFootnoteReference>>referenceIndex)"
+
+	| source doc references html |
+	source := CMarkFixtures lines: #( 'x[^a]' '' '[^u]: unused[^a]' '' 'y[^a]' '' '[^a]: A' ).
+	doc := CMark parse: source options: self footnotes.
+	self assert: (doc footnoteDefinitions collect: [ :each | each label ]) asArray equals: #( 'a' ).
+	references := self nodesOf: CMarkFootnoteReference in: doc.
+	self assert: (references collect: [ :each | each referenceIndex ]) asArray equals: #( 1 2 ).
+	self assert: doc footnoteDefinitions first references asArray equals: references asArray.
+	html := CMark render: source format: #html options: self footnotes.
+	self assert: (html includesSubstring: 'id="fnref-a-3"').
+	self deny: (html includesSubstring: 'id="fnref-a-2"')
+]
+
+{ #category : 'tests' }
 CMarkParseTest >> testFootnotesOff [
 	| doc |
 	doc := CMark parse: CMarkFixtures footnotes.

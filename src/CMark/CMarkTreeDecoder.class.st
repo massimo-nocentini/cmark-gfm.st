@@ -209,7 +209,7 @@ CMarkTreeDecoder >> int3At: base [
 
 { #category : 'private' }
 CMarkTreeDecoder >> linkFootnotes [
-	"Link each footnote reference to its definition; then each definition's references are in source order, and their referenceIndex their rank there (cmark numbers the references in document order before it moves the definitions to the end)"
+	"Link each footnote reference to its definition; then each definition's references are in source order, and their referenceIndex their rank there.  cmark numbers the references in document order before it moves the definitions to the end, so the rank is cmark's ref_ix, except when cmark dropped a definition (unreferenced, or repeated) that held references to the same footnote: they took numbers in cmark but are not in the tape"
 
 	| definitions |
 	definitions := IdentitySet new.
