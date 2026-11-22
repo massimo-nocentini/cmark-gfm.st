@@ -57,6 +57,47 @@ CMarkNodeTest >> testAddChild [
 ]
 
 { #category : 'tests' }
+CMarkNodeTest >> testBuildingKeepsParentsConsistent [
+	"A building call that signals changes nothing, so every node stays in the children of its parent"
+
+	| p t u q e consistent |
+	consistent := [ :root |
+	              root do: [ :each |
+		              each children do: [ :child | self assert: child parent identicalTo: each ].
+		              each parent ifNotNil: [ :parent | self assert: (parent children identityIncludes: each) ] ] ].
+	t := CMarkText literal: 'b'.
+	u := CMarkText literal: 'c'.
+	p := CMarkParagraph with: { t. u }.
+	e := CMarkEmph new.
+	q := CMarkParagraph with: { e }.
+	"removeChild: of a node that is not my child"
+	self should: [ q removeChild: t ] raise: CMarkError.
+	self assert: t parent identicalTo: p.
+	self assert: p children equals: { t. u }.
+	self should: [ q removeChild: CMarkText new ] raise: CMarkError.
+	"addAll: with a cycle further on"
+	self should: [ e addAll: { t. q } ] raise: CMarkError.
+	self assert: t parent identicalTo: p.
+	self assert: p children equals: { t. u }.
+	self assert: e children isEmpty.
+	"addAll: with a node twice"
+	self should: [ e addAll: { t. t } ] raise: CMarkError.
+	self assert: t parent identicalTo: p.
+	self assert: e children isEmpty.
+	consistent value: p; value: q.
+	"addAll: of my own child moves it to my end, as addChild: does"
+	self assert: (p addAll: { t }) equals: { t }.
+	self assert: p children equals: { u. t }.
+	self assert: p plainText equals: 'cb'.
+	"addAll: of nodes of another parent"
+	e addAll: (OrderedCollection with: u with: t).
+	self assert: p children isEmpty.
+	self assert: e children equals: { u. t }.
+	self assert: q plainText equals: 'cb'.
+	consistent value: p; value: q
+]
+
+{ #category : 'tests' }
 CMarkNodeTest >> testAnchors [
 	| h1 h2 h3 h4 doc |
 	h1 := self heading: 'Hello, World!'.

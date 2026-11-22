@@ -84,10 +84,14 @@ CMarkNode >> acceptCMarkVisitor: aVisitor [
 
 { #category : 'building' }
 CMarkNode >> addAll: aCollection [
-	"Add the nodes of aCollection as my last children, in order; answer aCollection"
+	"Add the nodes of aCollection as my last children, in order (taking each from its parent, if any); answer aCollection.  The whole collection is checked first: a node that comes twice, or that is me or one of my ancestors, signals CMarkError, and then nothing has changed"
 
-	aCollection do: [ :each | self cmarkAdopt: each ].
-	children := children , aCollection asArray.
+	| nodes |
+	nodes := aCollection asArray.
+	nodes asIdentitySet size = nodes size ifFalse: [ CMarkError signal: 'a node cannot be added twice' ].
+	nodes do: [ :each | self cmarkCheckAdoptable: each ].
+	nodes do: [ :each | self cmarkAdopt: each ].
+	children := children , nodes.
 	^ aCollection
 ]
 
@@ -141,13 +145,20 @@ CMarkNode >> cmarkAddDecodedReference: aFootnoteReference [
 CMarkNode >> cmarkAdopt: aNode [
 	"Make me the parent of aNode, which leaves its old parent; a node cannot be its own ancestor"
 
+	self cmarkCheckAdoptable: aNode.
+	aNode parent ifNotNil: [ :oldParent | oldParent removeChild: aNode ].
+	aNode cmarkParent: self
+]
+
+{ #category : 'private' }
+CMarkNode >> cmarkCheckAdoptable: aNode [
+	"Signal CMarkError when aNode is me or one of my ancestors: it cannot become my child"
+
 	| node |
 	node := self.
 	[ node notNil ] whileTrue: [
 		node == aNode ifTrue: [ CMarkError signal: 'a node cannot be added to itself or to its descendants' ].
-		node := node parent ].
-	aNode parent ifNotNil: [ :oldParent | oldParent removeChild: aNode ].
-	aNode cmarkParent: self
+		node := node parent ]
 ]
 
 { #category : 'plain text' }
@@ -534,9 +545,10 @@ CMarkNode >> printOn: aStream [
 
 { #category : 'building' }
 CMarkNode >> removeChild: aNode [
-	"Remove aNode from my children; answer it"
+	"Remove aNode from my children; answer it.  A node that is not my child signals CMarkError, and keeps its parent"
 
-	children := children copyWithout: aNode.
+	(children identityIncludes: aNode) ifFalse: [ CMarkError signal: 'the node is not a child of this node' ].
+	children := children reject: [ :each | each == aNode ].
 	aNode cmarkParent: nil.
 	^ aNode
 ]
