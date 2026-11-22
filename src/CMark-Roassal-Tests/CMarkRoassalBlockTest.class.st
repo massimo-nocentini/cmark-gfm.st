@@ -139,6 +139,21 @@ CMarkRoassalBlockTest >> testFontFallback [
 ]
 
 { #category : 'tests' }
+CMarkRoassalBlockTest >> testFontsAreSharedByTheRenderings [
+	"Two renderings use the same LogicalFont for one style (and so the same cairo font): fonts made anew in every rendering let labels measure at the size of another font"
+
+	| doc style first second |
+	doc := self document: { (self paragraph: { (self text: 'shared') }) }.
+	style := CMarkRoassalTheme default baseStyle withSize: 10.8.
+	self render: doc.
+	first := renderer fonts fontFor: style.
+	self render: doc.
+	second := renderer fonts fontFor: style.
+	self assert: first identicalTo: second.
+	self assert: first pointSize equals: 11
+]
+
+{ #category : 'tests' }
 CMarkRoassalBlockTest >> testFootnoteDefinitionsTakeLinearTime [
 	"The marker column of the footnote definitions is measured once, not once per definition: a thousand of them take about the time of a list of a thousand items"
 

@@ -1,7 +1,7 @@
 "
 I am the font cache of one rendering (CMarkRoassalRenderer>>render:, which resets me at its end).
 
-I answer the LogicalFont of a CMarkInlineStyle (fontFor:), cached by its fontKey, after checking its family against the families of the image (a missing family falls back to RSLabel familyFontName at the same size: Roassal would silently use its default font at 10 points).
+I answer the LogicalFont of a CMarkInlineStyle (fontFor:), cached by its fontKey, after checking its family against the families of the image (a missing family falls back to RSLabel familyFontName at the same size: Roassal would silently use its default font at 10 points).  The LogicalFonts themselves are made once for the image (class side, sharedFontFamily:pointSize:emphasis:) and kept, as the fonts of the user interface are.  With new LogicalFonts in every rendering, the cairo fonts of Roassal (cached per FreeTypeFont in the weak CairoBackendCache) were made and dropped again and again, and after some renderings the labels of the 11-point footnote font measured about 1.25 times too wide: the golden tests failed on the batteries image and on Pharo 12, depending on the tests run before.  With shared fonts this was not seen again.
 
 I measure text per (fontKey, Character): the advance of a string is the sum of the advances of its characters.  That is exact because the cairo metrics provider of Roassal (RSCairoMetricsProvider, through RSLabel>>textExtents) sums glyph advances without kerning, and it keeps the cache small (a few hundred entries) where a cache per word would grow with every distinct word.  Each font has one probe RSLabel that does the measuring.  The ascent and the height of a font are those of its probe's textExtents (the ascent is the same for every text of a font).
 
@@ -17,10 +17,22 @@ Class {
 		'metrics',
 		'families'
 	],
+	#classVars : [
+		'SharedFonts'
+	],
 	#category : 'CMark-Roassal-Rendering',
 	#package : 'CMark-Roassal',
 	#tag : 'Rendering'
 }
+
+{ #category : 'fonts' }
+CMarkRoassalFonts class >> sharedFontFamily: aString pointSize: anInteger emphasis: aCode [
+	"The LogicalFont of the family aString at anInteger points with the emphasis aCode, made once and kept for the image, as the fonts of its user interface are (see the class comment: fonts made anew in every rendering let labels measure at a wrong size)"
+
+	^ (SharedFonts ifNil: [ SharedFonts := Dictionary new ])
+		  at: { aString. anInteger. aCode }
+		  ifAbsentPut: [ (LogicalFont familyName: aString pointSize: anInteger) emphasized: aCode ]
+]
 
 { #category : 'measuring' }
 CMarkRoassalFonts >> advanceOf: aCharacter in: aStyle [
@@ -62,7 +74,7 @@ CMarkRoassalFonts >> fontFor: aStyle [
 	"The LogicalFont of aStyle: its family (or the fallback family), its size, bold and italic"
 
 	^ fonts at: aStyle fontKey ifAbsentPut: [
-		  (LogicalFont familyName: (self familyFor: aStyle family) pointSize: aStyle pointSize) emphasized: aStyle emphasisCode ]
+		  self class sharedFontFamily: (self familyFor: aStyle family) pointSize: aStyle pointSize emphasis: aStyle emphasisCode ]
 ]
 
 { #category : 'measuring' }
