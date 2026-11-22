@@ -139,18 +139,20 @@ CMarkRoassalBlockTest >> testFontFallback [
 ]
 
 { #category : 'tests' }
-CMarkRoassalBlockTest >> testFontsAreSharedByTheRenderings [
-	"Two renderings use the same LogicalFont for one style (and so the same cairo font): fonts made anew in every rendering let labels measure at the size of another font"
+CMarkRoassalBlockTest >> testFontsOutliveTheRenderings [
+	"The LogicalFont of a style is kept between renderings, one per family, size and emphasis for the image: fonts that died with their rendering and were made anew in the next one made the cairo fonts of Roassal come and go, and labels then measured at a wrong size"
 
-	| doc style first second |
+	| doc style weak |
 	doc := self document: { (self paragraph: { (self text: 'shared') }) }.
-	style := CMarkRoassalTheme default baseStyle withSize: 10.8.
+	style := CMarkRoassalTheme default baseStyle withSize: 37.
 	self render: doc.
-	first := renderer fonts fontFor: style.
+	weak := WeakArray with: (renderer fonts fontFor: style).
+	renderer := nil.
+	Smalltalk garbageCollect.
+	self assert: (weak at: 1) notNil.
 	self render: doc.
-	second := renderer fonts fontFor: style.
-	self assert: first identicalTo: second.
-	self assert: first pointSize equals: 11
+	self assert: (renderer fonts fontFor: style) identicalTo: (weak at: 1).
+	self assert: (weak at: 1) pointSize equals: 37
 ]
 
 { #category : 'tests' }
