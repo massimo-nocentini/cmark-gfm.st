@@ -164,7 +164,7 @@ Limits of the view: the fonts of the image only, so CJK characters and emoji are
 
 ## Tests
 
-`CMark-Tests` (99 tests) and `CMark-Roassal-Tests` (64 tests, with golden structural dumps of the rendered fixtures). Without the plugin, the tests that parse skip themselves (43 and 11 of them): the rest covers the decoder on hand-made tapes, the hand-built trees, the visitor, the options and the renderer on hand-built trees. From a checkout of the VM:
+`CMark-Tests` (99 tests) and `CMark-Roassal-Tests` (68 tests, with golden structural dumps of the rendered fixtures). Without the plugin, the tests that parse skip themselves (43 and 11 of them): the rest covers the decoder on hand-made tapes, the hand-built trees, the visitor, the options and the renderer on hand-built trees. The structure of a dump is compared under any cairo, its bounds only under cairo 1.18 (the goldens' `CMarkRoassalGoldens cairoVersion`, which this repository's VM builds): cairo's text metrics differ between versions, and under another cairo, such as the 1.17.4 of the VMs of files.pharo.org, the golden tests skip once the structure matched. From a checkout of the VM:
 
 ```sh
 sh plugins/CMarkPlugin/tests/run-st-tests.sh build/build/vm Pharo.image

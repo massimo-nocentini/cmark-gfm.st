@@ -1,5 +1,5 @@
 "
-I hold the golden structural dumps of the renderings of the hand-built document of CMarkRoassalExamples and of the fixtures of CMarkFixtures (parsed with the GitHub options and footnotes), for CMarkRoassalGoldenTest: one line per shape, indented by its depth, with its class, the typeName of its model, its bounds rounded to 0.5 (left top right bottom) and the text of a label (non-ASCII characters escaped).  They were generated once and reviewed; regenerate them only for an intended change of the layout, and review the diff.
+I hold the golden structural dumps of the renderings of the hand-built document of CMarkRoassalExamples and of the fixtures of CMarkFixtures (parsed with the GitHub options and footnotes), for CMarkRoassalGoldenTest: one line per shape, indented by its depth, with its class, the typeName of its model, its bounds rounded to 0.5 (left top right bottom) and the text of a label (non-ASCII characters escaped).  They were generated once and reviewed; regenerate them only for an intended change of the layout, and review the diff.  Their bounds hold the text metrics of the cairo of cairoVersion, the one that this repository's VM builds (the structure holds under any cairo).
 "
 Class {
 	#name : 'CMarkRoassalGoldens',
@@ -8,6 +8,13 @@ Class {
 	#package : 'CMark-Roassal-Tests',
 	#tag : 'Support'
 }
+
+{ #category : 'accessing' }
+CMarkRoassalGoldens class >> cairoVersion [
+	"The version of the cairo that measured the labels of the goldens (CMarkRoassalGoldenTest compares the bounds under its major and minor version only)"
+
+	^ '1.18.6'
+]
 
 { #category : 'goldens' }
 CMarkRoassalGoldens class >> footnotes [
