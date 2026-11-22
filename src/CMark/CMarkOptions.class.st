@@ -47,9 +47,9 @@ CMarkOptions class >> commonMark [
 
 { #category : 'accessing' }
 CMarkOptions class >> defaultMaxInputSize [
-	"The default maxInputSize: 32 Mi characters (bytes of a ByteArray), the cap of the native VMs"
+	"The default maxInputSize: 32 Mi characters (bytes of a ByteArray) natively, 16 Mi on WebAssembly (CMarkPrimitives defaultMaxInputSize)"
 
-	^ 33554432
+	^ CMarkPrimitives defaultMaxInputSize
 ]
 
 { #category : 'accessing' }
@@ -149,6 +149,15 @@ CMarkOptions >> cBudgetArgument [
 	"The cBudget argument of the primitives: -1 for the default of the plugin"
 
 	^ cBudget ifNil: [ -1 ]
+]
+
+{ #category : 'checking' }
+CMarkOptions >> checkInputSize: aSource [
+	"Signal CMarkInputTooLarge when aSource (a String, or a ByteArray of UTF-8) is larger than maxInputSize, in characters or bytes"
+
+	maxInputSize ifNil: [ ^ self ].
+	aSource size > maxInputSize ifTrue: [
+		CMarkInputTooLarge signalLimit: maxInputSize actual: aSource size ]
 ]
 
 { #category : 'private' }

@@ -42,7 +42,10 @@ CMarkOptionsTest >> testDefaults [
 	self assert: o cBudget isNil.
 	self assert: o cBudgetArgument equals: -1.
 	self assert: o maxInputSize equals: CMarkOptions defaultMaxInputSize.
-	self assert: CMarkOptions defaultMaxInputSize equals: 32 * 1024 * 1024.
+	self assert: CMarkOptions defaultMaxInputSize equals: CMarkPrimitives defaultMaxInputSize.
+	self assert: CMarkOptions defaultMaxInputSize equals: (CMarkPrimitives platform = 'emscripten'
+			 ifTrue: [ 16 * 1024 * 1024 ]
+			 ifFalse: [ 32 * 1024 * 1024 ]).
 	#( #sourcePos #hardBreaks #noBreaks #smart #githubPreLang #liberalHtmlTag #footnotes #strikethroughDoubleTilde
 	   #tablePreferStyleAttributes #fullInfoString #unsafe ) do: [ :each | self deny: (o perform: each) ].
 	self assert: (o maxDepth: nil; maxDepthArgument) equals: 0.
