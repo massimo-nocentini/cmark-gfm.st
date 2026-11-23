@@ -153,6 +153,50 @@ CMarkClassCommentToolMorphTest >> testKeepsOneTabWhenTheSystemChanges [
 ]
 
 { #category : 'tests' }
+CMarkClassCommentToolMorphTest >> testBlankCommentRemovesTheTab [
+	"Clearing the comment of the class removes its built Markdown tab, which would else show the note of an empty comment; the presenter stops listening"
+
+	| aClass browser tool presenter |
+	self requireCanvas.
+	aClass := self scratchClass: #CMarkCalypsoScratchA comment: self richComment.
+	browser := self browserOn: aClass.
+	tool := self markdownToolOf: browser.
+	self show: tool in: browser.
+	presenter := tool presenter.
+	aClass comment: ''.
+	browser rebuildToolsForChangedEnvironment.
+	self assert: (self markdownToolsOf: browser) isEmpty.
+	self deny: presenter isSubscribed.
+	aClass comment: (String new: 3 withAll: (Character value: 160)).
+	browser rebuildToolsForChangedEnvironment.
+	self assert: (self markdownToolsOf: browser) isEmpty
+]
+
+{ #category : 'tests' }
+CMarkClassCommentToolMorphTest >> testRemovingTheClassRemovesTheTab [
+	"The Markdown tab of a removed class goes away with its other tabs, built or not, and its presenter stops listening"
+
+	| aClass browser tool presenter |
+	self requireCanvas.
+	aClass := self scratchClass: #CMarkCalypsoScratchA comment: self richComment.
+	browser := self browserOn: aClass.
+	tool := self markdownToolOf: browser.
+	self show: tool in: browser.
+	presenter := tool presenter.
+	aClass removeFromSystem.
+	browser rebuildToolsForChangedEnvironment.
+	self assert: (self markdownToolsOf: browser) isEmpty.
+	self deny: presenter isSubscribed.
+	"not shown"
+	aClass := self scratchClass: #CMarkCalypsoScratchB comment: self richComment.
+	browser selectClass: aClass.
+	self assert: (self markdownToolsOf: browser) size equals: 1.
+	aClass removeFromSystem.
+	browser rebuildToolsForChangedEnvironment.
+	self assert: (self markdownToolsOf: browser) isEmpty
+]
+
+{ #category : 'tests' }
 CMarkClassCommentToolMorphTest >> testIconAndTitle [
 	| tool |
 	tool := CMarkClassCommentToolMorph new.

@@ -3,7 +3,7 @@
 
 I show the comment of the selected class as **Markdown**: cmark-gfm parses it and `CMarkRoassalRenderer` draws it, in a `CMarkCommentPresenter` whose Spec morph fills me.
 
-- I am activated like the *UML-Class* tab of Roassal (a class is selected), but only for a class whose comment is not empty (or only blanks).
+- I am activated like the *UML-Class* tab of Roassal (a class is selected), but only for a class whose comment is not blank (spaces, Unicode ones included); I go away when the comment becomes blank (`wantsStayInDifferentContext`) and when my class is removed (`belongsToRemovedBrowserContext`).
 - My `activationPriority`, -200 like the UML-Class tab's, leaves the default selection to the definition and the comment.
 - I need nothing of Roassal-UML-Calypso, only Calypso.
 - Calypso keeps me, built, while my class stays selected (`isValidInContext:`): through the changes of the system (a method compiled, a comment accepted), the switch to the class side and the selection of a method.
@@ -67,6 +67,13 @@ CMarkClassCommentToolMorph >> belongsToCurrentBrowserContext [
 	^ (browser isClassSelected: targetClass) or: [ browser isClassSelected: targetClass classSide ]
 ]
 
+{ #category : 'testing' }
+CMarkClassCommentToolMorph >> belongsToRemovedBrowserContext [
+	"My class was removed: Calypso removes me with the other tabs of the class"
+
+	^ targetClass isObsolete
+]
+
 { #category : 'building' }
 CMarkClassCommentToolMorph >> build [
 	| morph |
@@ -126,6 +133,14 @@ CMarkClassCommentToolMorph >> targetClass [
 	"The class whose comment I show (its instance side)"
 
 	^ targetClass
+]
+
+{ #category : 'testing' }
+CMarkClassCommentToolMorph >> wantsStayInDifferentContext [
+	"Calypso keeps a built tab that is no longer activated (the user may be reading it) unless it answers false: I go away as soon as the comment of my class becomes blank, as I would not be activated for it"
+
+	(CMarkCommentPresenter hasCommentToShow: targetClass) ifFalse: [ ^ false ].
+	^ super wantsStayInDifferentContext
 ]
 
 { #category : 'accessing' }

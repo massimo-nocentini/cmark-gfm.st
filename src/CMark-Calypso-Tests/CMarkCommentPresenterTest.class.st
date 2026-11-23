@@ -96,6 +96,20 @@ CMarkCommentPresenterTest >> testEmptyCommentNote [
 ]
 
 { #category : 'tests' }
+CMarkCommentPresenterTest >> testHasCommentToShow [
+	| nbsp |
+	nbsp := String new: 3 withAll: (Character value: 160).
+	self deny: (CMarkCommentPresenter hasCommentToShow: nil).
+	self deny: (CMarkCommentPresenter hasCommentToShow: (self scratchClass: #CMarkCalypsoScratchA)).
+	self deny: (CMarkCommentPresenter hasCommentToShow: (self scratchClass: #CMarkCalypsoScratchB comment: nbsp)).
+	(scratchClasses last) comment: (String withAll: ((#( 16r2003 16r200B 16r202F 16r3000 16rFEFF 9 10 13 32 ) collect: [ :each | Character value: each ]))).
+	self deny: (CMarkCommentPresenter hasCommentToShow: scratchClasses last).
+	scratchClasses last comment: nbsp , 'x'.
+	self assert: (CMarkCommentPresenter hasCommentToShow: scratchClasses last).
+	self assert: (CMarkCommentPresenter hasCommentToShow: scratchClasses last class)
+]
+
+{ #category : 'tests' }
 CMarkCommentPresenterTest >> testIgnoresTheCommentsOfOtherClasses [
 	| presenter other first |
 	self requireCanvas.

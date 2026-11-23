@@ -132,6 +132,8 @@ CMarkCalypsoTestCase >> tearDown [
 	scratchClasses do: [ :each |
 		| name |
 		name := each name.
+		"a scratch class that a test removed is named AnObsolete..."
+		(name beginsWith: 'AnObsolete') ifTrue: [ name := (name allButFirst: 'AnObsolete' size) asSymbol ].
 		each isObsolete ifFalse: [ each removeFromSystem ].
 		"removing a class leaves its binding in Undeclared; nothing refers to a scratch class by name"
 		Undeclared removeKey: name ifAbsent: [ nil ] ].

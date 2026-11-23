@@ -31,9 +31,18 @@ CMarkCommentPresenter class >> commentOf: aClassOrNil [
 
 { #category : 'comments' }
 CMarkCommentPresenter class >> hasCommentToShow: aClassOrNil [
-	"Whether aClassOrNil has a comment that is not only blanks"
+	"Whether aClassOrNil has a comment that is not only blanks (isBlank:)"
 
-	^ ((self commentOf: aClassOrNil) allSatisfy: [ :each | each isSeparator ]) not
+	^ ((self commentOf: aClassOrNil) allSatisfy: [ :each | self isBlank: each ]) not
+]
+
+{ #category : 'comments' }
+CMarkCommentPresenter class >> isBlank: aCharacter [
+	"Whether aCharacter shows nothing: a separator, a Unicode space (White_Space: no-break space, en quad to hair space, narrow no-break space, ideographic space...), a zero width space or a byte order mark"
+
+	aCharacter isSeparator ifTrue: [ ^ true ].
+	^ #( 16r85 16rA0 16r1680 16r2000 16r2001 16r2002 16r2003 16r2004 16r2005 16r2006 16r2007 16r2008 16r2009 16r200A 16r200B 16r2028 16r2029 16r202F 16r205F 16r3000 16rFEFF )
+		  includes: aCharacter asInteger
 ]
 
 { #category : 'theme' }
