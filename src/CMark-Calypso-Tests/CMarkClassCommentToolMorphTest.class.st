@@ -217,7 +217,9 @@ CMarkClassCommentToolMorphTest >> testRemovingTheClassRemovesTheTab [
 	tool := self markdownToolOf: browser.
 	self show: tool in: browser.
 	presenter := tool commentPresenter.
+	self deny: tool belongsToRemovedBrowserContext.
 	aClass removeFromSystem.
+	self assert: tool belongsToRemovedBrowserContext.
 	browser rebuildToolsForChangedEnvironment.
 	self assert: (self markdownToolsOf: browser) isEmpty.
 	self deny: presenter isSubscribed.
