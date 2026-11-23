@@ -136,7 +136,12 @@ CMarkCommentPresenterTest >> testHasCommentToShow [
 	self deny: (CMarkCommentPresenter hasCommentToShow: scratchClasses last).
 	scratchClasses last comment: nbsp , 'x'.
 	self assert: (CMarkCommentPresenter hasCommentToShow: scratchClasses last).
-	self assert: (CMarkCommentPresenter hasCommentToShow: scratchClasses last class)
+	self assert: (CMarkCommentPresenter hasCommentToShow: scratchClasses last class).
+	"a removed class shows nothing"
+	scratchClasses last removeFromSystem.
+	self assert: scratchClasses last isObsolete.
+	self assert: (CMarkCommentPresenter commentOf: scratchClasses last) equals: ''.
+	self deny: (CMarkCommentPresenter hasCommentToShow: scratchClasses last)
 ]
 
 { #category : 'tests' }

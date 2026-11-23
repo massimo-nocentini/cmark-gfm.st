@@ -23,10 +23,12 @@ Class {
 
 { #category : 'comments' }
 CMarkCommentPresenter class >> commentOf: aClassOrNil [
-	"The comment of aClassOrNil (of its instance side: a metaclass has its class's comment), '' when it has none"
+	"The comment of aClassOrNil (of its instance side: a metaclass has its class's comment), '' when it has none, when it was removed (obsolete) or when its comment cannot be read (the changes file being written by another process)"
 
-	aClassOrNil ifNil: [ ^ '' ].
-	^ aClassOrNil instanceSide comment ifNil: [ '' ]
+	(aClassOrNil isNil or: [ aClassOrNil isObsolete ]) ifTrue: [ ^ '' ].
+	^ [ aClassOrNil instanceSide comment ifNil: [ '' ] ]
+		  on: Error
+		  do: [ :error | '' ]
 ]
 
 { #category : 'comments' }

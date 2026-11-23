@@ -139,6 +139,7 @@ CMarkClassCommentToolMorph >> targetClass [
 CMarkClassCommentToolMorph >> wantsStayInDifferentContext [
 	"Calypso keeps a built tab that is no longer activated (the user may be reading it) unless it answers false: I go away as soon as the comment of my class becomes blank, as I would not be activated for it"
 
+	self belongsToRemovedBrowserContext ifTrue: [ ^ false ].
 	(CMarkCommentPresenter hasCommentToShow: targetClass) ifFalse: [ ^ false ].
 	^ super wantsStayInDifferentContext
 ]
