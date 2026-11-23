@@ -1,5 +1,5 @@
 "
-I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, without footnotes: see options) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once the pointer is over the canvas).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one, both wrapping long code lines and long words so that the page keeps the width of the theme) unless markdownTheme: sets one; once built, I draw again when the UI theme changes (uiThemeChanged).
+I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, without footnotes: see options) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once a click gave the canvas the focus).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one, both wrapping long code lines and long words so that the page keeps the width of the theme) unless markdownTheme: sets one; once built, I draw again when the UI theme changes (uiThemeChanged).
 
 	(CMarkCommentPresenter on: CMarkRoassalRenderer) open.
 
@@ -133,9 +133,8 @@ CMarkCommentPresenter >> drawOn: aCanvas [
 		contents := self class noteDocument: contents ].
 	shape := (CMarkRoassalRenderer theme: theme) show: contents on: aCanvas.
 	"the morph of the canvas announces the changes of the UI theme of Pharo"
-	aCanvas when: RSThemeChangedEvent do: [ :event | self uiThemeChanged ] for: self.
-	"the keys of the canvas controller act once the canvas has the focus, as in the UML tab of Roassal"
-	aCanvas when: RSMouseEnter do: [ :event | aCanvas morph ifNotNil: [ :morph | morph takeKeyboardFocus ] ] for: self
+	aCanvas when: RSThemeChangedEvent do: [ :event | self uiThemeChanged ] for: self
+	"the keys of the canvas controller act once a click gave the canvas the focus (RSAthensMorph>>mouseDown:); the pointer passing over it does not take the keys from the lists of the browser"
 ]
 
 { #category : 'notes' }

@@ -96,6 +96,36 @@ CMarkCommentPresenterTest >> testEmptyCommentNote [
 ]
 
 { #category : 'tests' }
+CMarkCommentPresenterTest >> testFocusComesWithAClickNotWithThePointer [
+	"The pointer passing over the canvas leaves the keyboard focus where it is (the lists of the browser); a click gives it to the canvas, for the keys of the canvas controller"
+
+	| presenter window morph hand |
+	self requireCanvas.
+	presenter := self presenterOn: (self scratchClass: #CMarkCalypsoScratchA comment: 'text').
+	window := presenter open.
+	[
+	morph := presenter roassal adapter widget.
+	hand := self currentHand.
+	hand newKeyboardFocus: window window.
+	morph handleMouseEnter: (MouseEvent new
+			 setType: #mouseEnter
+			 position: morph center
+			 buttons: 0
+			 hand: hand).
+	self deny: hand keyboardFocus identicalTo: morph.
+	morph mouseDown: (MouseButtonEvent new
+			 setType: #mouseDown
+			 position: morph center
+			 which: MouseButtonEvent redButton
+			 buttons: MouseButtonEvent redButton
+			 hand: hand
+			 stamp: Time millisecondClockValue).
+	self assert: hand keyboardFocus identicalTo: morph ] ensure: [
+		hand ifNotNil: [ hand releaseKeyboardFocus ].
+		window close ]
+]
+
+{ #category : 'tests' }
 CMarkCommentPresenterTest >> testHasCommentToShow [
 	| nbsp |
 	nbsp := String new: 3 withAll: (Character value: 160).
