@@ -5,7 +5,7 @@ I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm
 
 I am the content of the Markdown tab of the Calypso browser (CMarkClassCommentToolMorph), and work alone too.
 
-I draw again when the comment of my class changes (ClassCommented, from the SystemAnnouncer, to which I subscribe weakly when I am made) and when targetClass: gives me another class.  I unsubscribe when my window closes (windowIsClosing) or when told to (unsubscribe: the Calypso tab does it when it is removed, and when its browser closes).  I never fail on a comment: an empty comment, a VM without the CMarkPlugin and a comment that cmark refuses each show a short muted note instead.
+I draw again when the comment of my class changes (ClassCommented, from the SystemAnnouncer, to which I subscribe weakly when I am made) and when targetClass: gives me another class.  I draw in the Morphic UI process only (refresh): a change announced by another process (a load in the background, a theme set by a script) is drawn by the UI process at its next cycle, and the changes that wait for it are drawn once.  I unsubscribe when my window closes (windowIsClosing) or when told to (unsubscribe: the Calypso tab does it when it is removed, and when its browser closes).  I never fail on a comment: an empty comment, a VM without the CMarkPlugin and a comment that cmark refuses each show a short muted note instead.
 "
 Class {
 	#name : 'CMarkCommentPresenter',
@@ -14,7 +14,8 @@ Class {
 		'targetClass',
 		'roassal',
 		'markdownTheme',
-		'shape'
+		'shape',
+		'refreshPending'
 	],
 	#category : 'CMark-Calypso-Presenter',
 	#package : 'CMark-Calypso',
@@ -91,7 +92,7 @@ CMarkCommentPresenter >> canvas [
 
 { #category : 'announcements' }
 CMarkCommentPresenter >> classCommented: aClassCommented [
-	"The comment of a class changed: draw again when it is mine"
+	"The comment of a class changed: draw again when it is mine (refresh: in the UI process, as the announcing process may be another one)"
 
 	(targetClass notNil and: [ aClassCommented classCommented instanceSide == targetClass instanceSide ]) ifTrue: [ self refresh ]
 ]
@@ -185,7 +186,7 @@ CMarkCommentPresenter >> markdownTheme [
 
 { #category : 'accessing' }
 CMarkCommentPresenter >> markdownTheme: aThemeOrNil [
-	"Draw with aThemeOrNil (nil: follow the UI theme)"
+	"Draw with aThemeOrNil (nil: follow the UI theme), by refresh, in the UI process"
 
 	markdownTheme := aThemeOrNil.
 	self refresh
@@ -205,8 +206,35 @@ CMarkCommentPresenter >> roassal [
 
 { #category : 'rendering' }
 CMarkCommentPresenter >> refresh [
-	"Draw again: on a new canvas of my Roassal presenter once it is built, else when it is built (or when canvas is asked)"
+	"Draw again, in the Morphic UI process: now when I am in it (or when there is none: no world loop draws my morph), else at the next cycle of the UI process.  A comment changed by another process (a load in the background) was drawn by that process while the UI process drew the world, and the drawing failed now and then (MessageNotUnderstood: receiver of #intersect: is nil, in RSMorphicHost>>dirtyRectangle:).  A refresh asked while another one waits for the UI process adds nothing: the one that waits draws what there is when it runs"
 
+	self isInUIProcess ifTrue: [ ^ self refreshNow ].
+	refreshPending == true ifTrue: [ ^ self ].
+	refreshPending := true.
+	self currentWorld defer: [ refreshPending == true ifTrue: [ self refreshNow ] ]
+]
+
+{ #category : 'rendering' }
+CMarkCommentPresenter >> isInUIProcess [
+	"Whether the active process may draw my canvas: it is the Morphic UI process, or there is no UI process (no world loop runs the work deferred to it)"
+
+	| uiProcess |
+	uiProcess := MorphicUIManager uiProcess.
+	^ uiProcess isNil or: [ uiProcess == Processor activeProcess or: [ uiProcess isTerminated ] ]
+]
+
+{ #category : 'rendering' }
+CMarkCommentPresenter >> isRefreshPending [
+	"Whether a refresh waits for the UI process (refresh)"
+
+	^ refreshPending == true
+]
+
+{ #category : 'rendering' }
+CMarkCommentPresenter >> refreshNow [
+	"Draw again here, in the UI process (refresh): on a new canvas of my Roassal presenter once it is built, else when it is built (or when canvas is asked).  A refresh that waits for the UI process has nothing more to do"
+
+	refreshPending := false.
 	roassal ifNil: [ ^ self ].
 	roassal adapter
 		ifNil: [ roassal canvas: nil ]
@@ -251,7 +279,7 @@ CMarkCommentPresenter >> targetClass [
 
 { #category : 'accessing' }
 CMarkCommentPresenter >> targetClass: aClass [
-	"Show the comment of aClass"
+	"Show the comment of aClass (drawn by refresh, in the UI process)"
 
 	targetClass := aClass.
 	self refresh
@@ -259,7 +287,7 @@ CMarkCommentPresenter >> targetClass: aClass [
 
 { #category : 'theme' }
 CMarkCommentPresenter >> uiThemeChanged [
-	"The UI theme of Pharo changed (the morph of my canvas got themeChanged): draw again when my theme follows it"
+	"The UI theme of Pharo changed (the morph of my canvas got themeChanged, in the process that set the theme): draw again when my theme follows it (refresh: in the UI process)"
 
 	markdownTheme ifNil: [ self refresh ]
 ]

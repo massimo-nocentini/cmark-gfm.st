@@ -1,5 +1,5 @@
 "
-I test CMarkCommentPresenter: the canvas of a class comment (the CMark shape, the camera of canvasFor:, long lines that wrap, Smalltalk code that keeps its text), the theme (dark or light UI theme, set or followed, a change of the UI theme), the notes of an empty comment, of a VM without the plugin and of a comment cmark refuses, drawing again when the comment or the class changes, the window title, the keyboard focus, and the weak subscription to the changes of comments, which ends when the window closes.
+I test CMarkCommentPresenter: the canvas of a class comment (the CMark shape, the camera of canvasFor:, long lines that wrap, Smalltalk code that keeps its text), the theme (dark or light UI theme, set or followed, a change of the UI theme), the notes of an empty comment, of a VM without the plugin and of a comment cmark refuses, drawing again when the comment or the class changes, the drawing in the Morphic UI process only when another process asks for it (once for all that wait), the window title, the keyboard focus, and the weak subscription to the changes of comments, which ends when the window closes.
 "
 Class {
 	#name : 'CMarkCommentPresenterTest',
@@ -62,6 +62,122 @@ CMarkCommentPresenterTest >> testDrawsAgainForAnotherClass [
 	self assert: presenter targetClass identicalTo: other.
 	self assert: presenter shape model headings first plainText equals: 'Second'.
 	self assert: presenter roassal currentCanvas shapes first identicalTo: presenter shape
+]
+
+{ #category : 'tests' }
+CMarkCommentPresenterTest >> testAnotherProcessChangingTheCommentDrawsInTheUIProcess [
+	"The comment changed and announced by other processes (a load in the background) while the UI process draws the window: only the UI process draws the canvas, nothing fails, and the last comment is shown once the UI process ran the work deferred to it.  Drawn by the announcing process, the canvas raced with the drawing of the world (MessageNotUnderstood: receiver of #intersect: is nil, in RSMorphicHost>>dirtyRectangle:)"
+
+	| uiProcess aClass presenter window errors finished deadline |
+	self requireCanvas.
+	self requirePlugin.
+	self requireUIProcess.
+	uiProcess := Processor activeProcess.
+	aClass := self scratchClass: #CMarkCalypsoScratchA comment: '# Comment 0'.
+	presenter := self recordingPresenterOn: aClass.
+	window := presenter open.
+	[
+	errors := OrderedCollection new.
+	finished := 0.
+	"above the priority of the UI process: each takes the processor from it when its delay ends, in the middle of a drawing too"
+	{
+		[
+		1 to: 20 do: [ :index |
+			aClass comment: '# Comment ' , index printString.
+			(Delay forMilliseconds: 2) wait ] ].
+		[
+		1 to: 40 do: [ :index |
+			SystemAnnouncer uniqueInstance classCommented: aClass.
+			(Delay forMilliseconds: 1) wait ] ] } do: [ :each |
+		[
+		[ each value ]
+			on: Error
+			do: [ :error | errors add: error ].
+		finished := finished + 1 ] forkAt: Processor userSchedulingPriority + 1 ].
+	"meanwhile the UI process draws the window (imageForm: the world of a headless image draws nothing) and runs the work deferred to it"
+	deadline := Time millisecondClockValue + 60000.
+	[ finished < 2 and: [ Time millisecondClockValue < deadline ] ] whileTrue: [
+		window window
+			changed;
+			imageForm.
+		self runUICycle ].
+	self assert: finished equals: 2.
+	self assert: errors asArray equals: #(  ).
+	self runUICycle.
+	self deny: presenter isRefreshPending.
+	self deny: presenter drawingProcesses isEmpty.
+	self assert: (presenter drawingProcesses reject: [ :each | each == uiProcess ]) asArray equals: #(  ).
+	self assert: presenter shape model headings first plainText equals: 'Comment 20'.
+	self assert: presenter roassal currentCanvas shapes first identicalTo: presenter shape.
+	self deny: (window window allMorphs anySatisfy: [ :each | each hasProperty: #errorOnDraw ]) ] ensure: [ window close ]
+]
+
+{ #category : 'tests' }
+CMarkCommentPresenterTest >> testRefreshesFromAnotherProcessAreDrawnOnce [
+	"The refreshes that another process asks while the UI process is busy wait for it and are drawn once, at its next cycle: ten changes of the comment, a change of the UI theme, a theme set and unset, another class (each way to draw again)"
+
+	| first other presenter drawings done errors |
+	self requireCanvas.
+	self requirePlugin.
+	self requireUIProcess.
+	first := self scratchClass: #CMarkCalypsoScratchA comment: '# Comment 0'.
+	other := self scratchClass: #CMarkCalypsoScratchB comment: '# Other'.
+	presenter := self recordingPresenterOn: first.
+	presenter build.
+	drawings := presenter drawingProcesses size.
+	self deny: presenter isRefreshPending.
+	done := Semaphore new.
+	errors := OrderedCollection new.
+	[
+	[
+	1 to: 10 do: [ :index | first comment: '# Comment ' , index printString ].
+	presenter uiThemeChanged.
+	presenter markdownTheme: CMarkRoassalTheme dark.
+	presenter targetClass: other.
+	presenter markdownTheme: nil ]
+		on: Error
+		do: [ :error | errors add: error ].
+	done signal ] fork.
+	"this test runs in the UI process: it waits, and runs no deferred work meanwhile"
+	self deny: (done waitTimeoutSeconds: 60).
+	self assert: errors asArray equals: #(  ).
+	self assert: presenter drawingProcesses size equals: drawings.
+	self assert: presenter isRefreshPending.
+	self assert: presenter targetClass identicalTo: other.
+	self assert: presenter shape model headings first plainText equals: 'Comment 0'.
+	self runUICycle.
+	self assert: presenter drawingProcesses size equals: drawings + 1.
+	self deny: presenter isRefreshPending.
+	self assert: presenter shape model headings first plainText equals: 'Other'.
+	self assert: presenter roassal currentCanvas shapes first identicalTo: presenter shape.
+	self assert: presenter roassal currentCanvas color equals: presenter markdownTheme background
+]
+
+{ #category : 'tests' }
+CMarkCommentPresenterTest >> testRefreshInTheUIProcessIsDrawnAtOnce [
+	"In the UI process a refresh draws at once, and a refresh that waited for the UI process then draws nothing more"
+
+	| presenter drawings done |
+	self requireCanvas.
+	self requireUIProcess.
+	presenter := self recordingPresenterOn: (self scratchClass: #CMarkCalypsoScratchA comment: 'text').
+	presenter build.
+	drawings := presenter drawingProcesses size.
+	presenter refresh.
+	self assert: presenter drawingProcesses size equals: drawings + 1.
+	done := Semaphore new.
+	[
+	presenter refresh.
+	done signal ] fork.
+	self deny: (done waitTimeoutSeconds: 60).
+	self assert: presenter isRefreshPending.
+	self assert: presenter drawingProcesses size equals: drawings + 1.
+	presenter refresh.
+	self deny: presenter isRefreshPending.
+	self assert: presenter drawingProcesses size equals: drawings + 2.
+	self runUICycle.
+	self assert: presenter drawingProcesses size equals: drawings + 2.
+	self assert: (presenter drawingProcesses allSatisfy: [ :each | each == Processor activeProcess ])
 ]
 
 { #category : 'tests' }

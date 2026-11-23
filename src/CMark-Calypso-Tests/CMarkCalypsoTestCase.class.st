@@ -1,5 +1,5 @@
 "
-I am the abstract test of the Markdown tab of Calypso.  My tests make scratch classes (scratchClass:, in the package CMark-Calypso-Tests-Scratch, removed with it by tearDown) whose comments they set and change, so that no class of the image is touched; the presenters they make are unsubscribed by tearDown, and the browsers closed.  The tests run in the Morphic UI process (runCase, inUIProcess:), one after the other with the work that the browsers and windows defer to it.
+I am the abstract test of the Markdown tab of Calypso.  My tests make scratch classes (scratchClass:, in the package CMark-Calypso-Tests-Scratch, removed with it by tearDown) whose comments they set and change, so that no class of the image is touched; the presenters they make are unsubscribed by tearDown, and the browsers closed.  The tests run in the Morphic UI process (runCase, inUIProcess:), one after the other with the work that the browsers and windows defer to it; requireUIProcess skips a test that needs it, runUICycle runs that work (one cycle of the world) within a test, and recordingPresenterOn: makes a presenter that records the process of each of its drawings.
 
 richComment is a comment with a heading, a list, a code block and a table.
 "
@@ -100,6 +100,28 @@ CMarkCalypsoTestCase >> presenterOn: aClass [
 	"A CMarkCommentPresenter on aClass, unsubscribed by tearDown"
 
 	^ presenters add: (CMarkCommentPresenter on: aClass)
+]
+
+{ #category : 'helpers' }
+CMarkCalypsoTestCase >> recordingPresenterOn: aClass [
+	"A CMarkRecordingCommentPresenter on aClass (it records the process of each drawing), unsubscribed by tearDown"
+
+	^ presenters add: (CMarkRecordingCommentPresenter on: aClass)
+]
+
+{ #category : 'helpers' }
+CMarkCalypsoTestCase >> requireUIProcess [
+	"Skip unless the test runs in the Morphic UI process (runCase), the process that runs the work deferred to it"
+
+	MorphicUIManager uiProcess == Processor activeProcess ifFalse: [
+		self skip: 'the test does not run in the Morphic UI process: no world loop runs the work deferred to it' ]
+]
+
+{ #category : 'helpers' }
+CMarkCalypsoTestCase >> runUICycle [
+	"One cycle of the world, here in the UI process: the work deferred to the UI process runs, and the world is drawn"
+
+	self currentWorld doOneCycleNow
 ]
 
 { #category : 'fixtures' }
