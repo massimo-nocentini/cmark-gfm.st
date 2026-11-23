@@ -159,9 +159,32 @@ CMarkCommentPresenterTest >> testRendersTheComment [
 	self assert: document headings first plainText equals: 'Rendering'.
 	self assert: (document detect: [ :each | each isKindOf: CMarkTable ] ifNone: [ nil ]) notNil.
 	self assert: (document detect: [ :each | each isKindOf: CMarkCodeBlock ] ifNone: [ nil ]) notNil.
-	"footnotes are on"
-	self assert: document footnoteDefinitions size equals: 1.
 	self assert: ((self labelsOf: presenter shape) anySatisfy: [ :each | each key text = 'Rendering' ])
+]
+
+{ #category : 'tests' }
+CMarkCommentPresenterTest >> testSmalltalkCodeKeepsItsText [
+	"Footnotes are off: with them, cmark-gfm 0.29.0.gfm.14 takes [^... for a footnote label and drops the text of a label that holds an inline or a line break (the comment of GZipConstants in Pharo 12 lost 'is not part of RFC1952')"
+
+	| presenter text |
+	self requireCanvas.
+	self requirePlugin.
+	self assert: CMarkCommentPresenter options equals: CMarkOptions gfm.
+	self deny: CMarkCommentPresenter options footnotes.
+	presenter := self presenterOn: (self scratchClass: #CMarkCalypsoScratchA comment: 'amending the text as follows..
+    ifTrue:[^self error:''Cannot decompress encrypted stream. Encryption
+is not part of RFC1952''].
+
+Then [^self error: ''a <b>c''] and more text here.
+
+[^x]: not a footnote
+').
+	presenter canvas.
+	text := presenter shape model plainText.
+	self assert: (text includesSubstring: 'Encryption is not part of RFC1952').
+	self assert: (text includesSubstring: '''a <b>c''] and more text here.').
+	self assert: (text includesSubstring: '[^x]: not a footnote').
+	self assert: presenter shape model footnoteDefinitions isEmpty
 ]
 
 { #category : 'tests' }

@@ -1,5 +1,5 @@
 "
-I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, with footnotes) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once the pointer is over the canvas).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one) unless markdownTheme: sets one.
+I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, without footnotes: see options) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once the pointer is over the canvas).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one) unless markdownTheme: sets one.
 
 	(CMarkCommentPresenter on: CMarkRoassalRenderer) open.
 
@@ -63,11 +63,9 @@ CMarkCommentPresenter class >> noteDocument: aString [
 
 { #category : 'parsing' }
 CMarkCommentPresenter class >> options [
-	"The options of the parse of a comment: GitHub Flavored Markdown, with footnotes"
+	"The options of the parse of a comment: GitHub Flavored Markdown, without footnotes, as everywhere in CMark: cmark-gfm 0.29.0.gfm.14 cuts short a footnote label that holds an inline or a line break, and the cut text disappears (README, Limitations).  Class comments are full of Smalltalk code such as [^self error: '...'], and seldom have footnotes"
 
 	^ CMarkOptions gfm
-		  footnotes: true;
-		  yourself
 ]
 
 { #category : 'accessing' }

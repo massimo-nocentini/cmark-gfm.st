@@ -1,7 +1,7 @@
 "
 I am the abstract test of the Markdown tab of Calypso.  My tests make scratch classes (scratchClass:, in the package CMark-Calypso-Tests-Scratch, removed with it by tearDown) whose comments they set and change, so that no class of the image is touched; the presenters they make are unsubscribed by tearDown, and the browsers closed.
 
-richComment is a comment with a heading, a list, a code block, a table and a footnote.
+richComment is a comment with a heading, a list, a code block and a table.
 "
 Class {
 	#name : 'CMarkCalypsoTestCase',
@@ -60,7 +60,7 @@ CMarkCalypsoTestCase >> presenterOn: aClass [
 CMarkCalypsoTestCase >> richComment [
 	^ '# Rendering
 
-A comment drawn by **cmark-gfm**, with a footnote[^1].
+A comment drawn by **cmark-gfm**.
 
 - a list item
 - another, with `code`
@@ -73,8 +73,6 @@ A comment drawn by **cmark-gfm**, with a footnote[^1].
 |:-------|------:|
 | one    | 1     |
 | two    | 2     |
-
-[^1]: The footnote.
 '
 ]
 

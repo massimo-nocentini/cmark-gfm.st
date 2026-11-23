@@ -166,7 +166,7 @@ Limits of the view: the fonts of the image only, so CJK characters and emoji are
 
 ## Class comments in Calypso
 
-The package `CMark-Calypso` (group `Calypso`, in `default`) adds a **Markdown** tab to the Calypso browser, between the `Comment` and the `UML-Class` tabs: the comment of the selected class, parsed by cmark-gfm (`CMarkOptions gfm`, with footnotes) and drawn by `CMarkRoassalRenderer`. It needs only the Calypso, Spec and Roassal of the stock images, not Roassal-UML-Calypso (which the stock images do not have; the user's Roassal fork has it).
+The package `CMark-Calypso` (group `Calypso`, in `default`) adds a **Markdown** tab to the Calypso browser, between the `Comment` and the `UML-Class` tabs: the comment of the selected class, parsed by cmark-gfm (`CMarkOptions gfm`; footnotes stay off, as `[^self error: ...]` in a comment would be taken for a footnote label and lose text, see Limitations) and drawn by `CMarkRoassalRenderer`. It needs only the Calypso, Spec and Roassal of the stock images, not Roassal-UML-Calypso (which the stock images do not have; the user's Roassal fork has it).
 
 ```smalltalk
 (CMarkCommentPresenter on: CMarkRoassalRenderer) open.     "the same view in a window of its own"
