@@ -19,13 +19,11 @@ Without the plugin, the loop signals `CMarkUnavailable` before anything else.
 
 `testHook:value:`, nil removes one, `clearTestHooks` removes all; each forgets `pluginInfo`:
 
-| Hook | Value |
-|:-----|:------|
-| `#pluginMissing` | true: behave as if the module were absent |
-| `#protocol` | an Integer: pretend the plugin answered this protocol |
-| `#budget` | the budget of the first call of every loop |
-| `#cBudget` | the `cBudget` of every call |
-| `#grow` | a block of the byte count, evaluated instead of growing the object memory |
+- `#pluginMissing` (true: behave as if the module were absent);
+- `#protocol` (an Integer: pretend the plugin answered this protocol);
+- `#budget` (the budget of the first call of every loop);
+- `#cBudget` (the `cBudget` of every call);
+- `#grow` (a block of the byte count, evaluated instead of growing the object memory).
 "
 Class {
 	#name : 'CMarkPrimitives',

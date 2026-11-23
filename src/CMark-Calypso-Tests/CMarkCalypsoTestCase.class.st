@@ -3,7 +3,7 @@ I am the abstract test of the Markdown tab of Calypso.
 
 My tests make scratch classes (`scratchClass:`, in the package `CMark-Calypso-Tests-Scratch`, removed with it by `tearDown`) whose comments they set and change, so that no class of the image is touched; the presenters they make are unsubscribed by `tearDown`, and the browsers closed.
 
-The tests run in the Morphic UI process (`runCase`, `inUIProcess:`), one after the other with the work that the browsers and windows defer to it:
+The tests run in the Morphic UI process (`runCase`, `inUIProcess:`), one after the other with the work that the browsers and windows defer to it. My helpers for that:
 
 - `requireUIProcess` skips a test that needs it,
 - `runUICycle` runs that work (one cycle of the world) within a test, and

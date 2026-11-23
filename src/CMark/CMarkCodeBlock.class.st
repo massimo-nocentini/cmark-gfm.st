@@ -5,7 +5,7 @@ I am a code block:
 - `info` the info string of a fenced block (`''` for an indented one);
 - `language` its first word.
 
-`fenced` says whether I am fenced; `fenceLength`, `fenceCharacter` (a Character: \` or `$~`, nil when indented) and `fenceOffset` describe the fence.
+`fenced` says whether I am fenced; `fenceLength`, `fenceCharacter` (a `Character`, the backtick or the tilde, nil when indented) and `fenceOffset` describe the fence.
 
 ```smalltalk
 CMarkCodeBlock literal: 'x := 1.' , String lf info: 'smalltalk'

@@ -3,16 +3,14 @@ The baseline of CMark (https://github.com/massimo-nocentini/cmark-gfm.st): Markd
 
 ## Groups
 
-| Group | Loads |
-|:------|:------|
-| `Core` | the package `CMark`: the parse tree, its visitor, the decoder of the plugin's tape, the facade |
-| `Tests` | `CMark-Tests` |
-| `Roassal` | `Core` and `CMark-Roassal`, the renderer, on the Roassal of the stock image |
-| `RoassalTests` | `CMark-Roassal-Tests` |
-| `Calypso` | `Roassal` and `CMark-Calypso`: the Markdown tab of the Calypso browser, a class comment drawn by the renderer in a Spec presenter |
-| `CalypsoTests` | `CMark-Calypso-Tests` |
-| `RoassalFork` | the user's Roassal fork, branch `Pharo15`, then `Roassal` |
-| `default` | loads `Core`, `Tests`, `Roassal`, `RoassalTests`, `Calypso` and `CalypsoTests` |
+- `Core` (the package `CMark`: the parse tree, its visitor, the decoder of the plugin's tape, the facade);
+- `Tests` (`CMark-Tests`);
+- `Roassal` (`Core` and `CMark-Roassal`, the renderer, on the Roassal of the stock image);
+- `RoassalTests` (`CMark-Roassal-Tests`);
+- `Calypso` (`Roassal` and `CMark-Calypso`: the Markdown tab of the Calypso browser, a class comment drawn by the renderer in a Spec presenter);
+- `CalypsoTests` (`CMark-Calypso-Tests`);
+- `RoassalFork` (the user's Roassal fork, branch `Pharo15`, then `Roassal`);
+- `default` loads `Core`, `Tests`, `Roassal`, `RoassalTests`, `Calypso` and `CalypsoTests`.
 
 ## Dependencies
 
