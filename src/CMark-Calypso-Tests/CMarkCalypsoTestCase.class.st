@@ -1,5 +1,5 @@
 "
-I am the abstract test of the Markdown tab of Calypso.  My tests make scratch classes (scratchClass:, in the package CMark-Calypso-Tests-Scratch, removed with it by tearDown) whose comments they set and change, so that no class of the image is touched; the presenters they make are unsubscribed by tearDown, and the browsers closed.
+I am the abstract test of the Markdown tab of Calypso.  My tests make scratch classes (scratchClass:, in the package CMark-Calypso-Tests-Scratch, removed with it by tearDown) whose comments they set and change, so that no class of the image is touched; the presenters they make are unsubscribed by tearDown, and the browsers closed.  The tests run in the Morphic UI process (runCase, inUIProcess:), one after the other with the work that the browsers and windows defer to it.
 
 richComment is a comment with a heading, a list, a code block and a table.
 "
@@ -45,6 +45,33 @@ CMarkCalypsoTestCase >> browserOnPackage: aPackage [
 	^ browser
 ]
 
+{ #category : 'running' }
+CMarkCalypsoTestCase >> inUIProcess: aBlock [
+	"Run aBlock in the Morphic UI process and answer its value.  The browsers and windows of the tests defer work to the UI process (a Calypso view with an empty selection defers ensureVisibleLastItem, which rebuilds the tabs) and the UI process draws the windows that the tests open: run from the test's process, a test raced with that work and failed now and then.  In the UI process the deferred work runs after the block, and before the next block deferred.  Its failures, errors and skips are signalled again in the test's process.  Without a UI process, or when it is the active one, aBlock runs here"
+
+	| uiProcess done state caught value |
+	uiProcess := MorphicUIManager uiProcess.
+	(uiProcess isNil or: [ uiProcess == Processor activeProcess or: [ uiProcess isTerminated ] ]) ifTrue: [ ^ aBlock value ].
+	done := Semaphore new.
+	state := #waiting.
+	self currentWorld defer: [
+		state == #waiting ifTrue: [
+			state := #running.
+			[
+			[ value := aBlock value ]
+				on: Error , TestFailure , TestSkipped
+				do: [ :exception | caught := exception. exception return: nil ] ] ensure: [ done signal ] ] ].
+	(done waitTimeoutSeconds: 120) ifTrue: [
+		state == #waiting ifFalse: [ ^ self fail: 'the UI process did not end the test within 120 seconds' ].
+		"no world loop runs the deferred blocks"
+		state := #cancelled.
+		^ aBlock value ].
+	caught ifNil: [ ^ value ].
+	(caught isKindOf: TestSkipped) ifTrue: [ ^ self skip: caught messageText ].
+	(caught isKindOf: TestFailure) ifTrue: [ ^ self fail: caught messageText ].
+	^ self error: 'in the UI process: ' , caught class name , ': ' , caught messageText asString
+]
+
 { #category : 'helpers' }
 CMarkCalypsoTestCase >> markdownToolOf: aBrowser [
 	"The Markdown tab of aBrowser, or nil"
@@ -59,6 +86,13 @@ CMarkCalypsoTestCase >> markdownToolsOf: aBrowser [
 	"All the Markdown tabs of aBrowser (there must be one at most)"
 
 	^ (aBrowser tabManager tools select: [ :each | each class == CMarkClassCommentToolMorph ]) asArray
+]
+
+{ #category : 'running' }
+CMarkCalypsoTestCase >> runCase [
+	"setUp, the test and tearDown in the UI process, as the browsers and windows that the test makes (inUIProcess:); the next test, deferred to the UI process too, starts once the work that this one deferred is done"
+
+	self inUIProcess: [ super runCase ]
 ]
 
 { #category : 'helpers' }
