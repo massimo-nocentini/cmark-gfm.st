@@ -34,6 +34,18 @@ CMarkCalypsoTestCase >> browserOn: aClass [
 ]
 
 { #category : 'helpers' }
+CMarkCalypsoTestCase >> browserOnPackage: aPackage [
+	"A full Calypso browser on aPackage, no class selected, as browserOn:"
+
+	| browser |
+	browser := ClyFullBrowserMorph on: ClyNavigationEnvironment currentImage.
+	browsers add: browser.
+	browser prepareInitialStateBy: [ :each | each selectPackage: aPackage ].
+	browser ensureInitialState.
+	^ browser
+]
+
+{ #category : 'helpers' }
 CMarkCalypsoTestCase >> markdownToolOf: aBrowser [
 	"The Markdown tab of aBrowser, or nil"
 

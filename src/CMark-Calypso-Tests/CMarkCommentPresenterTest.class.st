@@ -201,6 +201,21 @@ CMarkCommentPresenterTest >> testNoPluginNote [
 ]
 
 { #category : 'tests' }
+CMarkCommentPresenterTest >> testRefusedCommentNote [
+	"A comment that cmark refuses (deeper than the plugin's limit of 1000) shows a muted note, not an error in the Roassal script"
+
+	| presenter note |
+	self requireCanvas.
+	self requirePlugin.
+	presenter := self presenterOn: (self scratchClass: #CMarkCalypsoScratchA comment: (String new: 1500 withAll: $>)).
+	note := presenter contents.
+	self assert: note isString.
+	self assert: (note beginsWith: 'The comment cannot be shown as Markdown: ').
+	presenter canvas.
+	self assert: (self noteOf: presenter) equals: note
+]
+
+{ #category : 'tests' }
 CMarkCommentPresenterTest >> testRendersTheComment [
 	| aClass presenter canvas document |
 	self requireCanvas.
@@ -277,6 +292,20 @@ CMarkCommentPresenterTest >> testIsDarkTheme [
 ]
 
 { #category : 'tests' }
+CMarkCommentPresenterTest >> testSubscriptionIsWeak [
+	"A presenter that nobody holds is not kept by its subscription to ClassCommented"
+
+	| aClass mine |
+	aClass := self scratchClass: #CMarkCalypsoScratchA comment: 'text'.
+	mine := [ self subscribersOfClassCommented select: [ :each | each class == CMarkCommentPresenter and: [ each targetClass == aClass ] ] ].
+	[
+	CMarkCommentPresenter on: aClass.
+	self assert: mine value size equals: 1.
+	Smalltalk garbageCollect.
+	self assert: mine value isEmpty ] ensure: [ mine value do: [ :each | each unsubscribe ] ]
+]
+
+{ #category : 'tests' }
 CMarkCommentPresenterTest >> testThemeFollowsTheUITheme [
 	"markdownTheme: draws again with the theme given; nil follows the UI theme"
 
@@ -294,6 +323,20 @@ CMarkCommentPresenterTest >> testThemeFollowsTheUITheme [
 		equals: (CMarkCommentPresenter isDarkUITheme
 				 ifTrue: [ CMarkRoassalTheme dark background ]
 				 ifFalse: [ CMarkRoassalTheme default background ])
+]
+
+{ #category : 'tests' }
+CMarkCommentPresenterTest >> testTitleFollowsTheClass [
+	| presenter window |
+	self requireCanvas.
+	presenter := self presenterOn: (self scratchClass: #CMarkCalypsoScratchA comment: 'one').
+	window := presenter open.
+	[
+	self assert: window title equals: 'Comment of CMarkCalypsoScratchA'.
+	presenter targetClass: (self scratchClass: #CMarkCalypsoScratchB comment: 'two').
+	self assert: window title equals: 'Comment of CMarkCalypsoScratchB'.
+	presenter targetClass: nil.
+	self assert: window title equals: 'Comment' ] ensure: [ window close ]
 ]
 
 { #category : 'tests' }

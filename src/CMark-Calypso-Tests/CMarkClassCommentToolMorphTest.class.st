@@ -44,6 +44,23 @@ CMarkClassCommentToolMorphTest >> testActivationStrategy [
 ]
 
 { #category : 'tests' }
+CMarkClassCommentToolMorphTest >> testActivation [
+	"Activated in a class context with a selected class whose comment is not blank, and not in a class context without a selected class (a package selected)"
+
+	| a browser contexts |
+	a := self scratchClass: #CMarkCalypsoScratchA comment: 'one'.
+	browser := self browserOn: a.
+	self assert: (browser navigationContexts anySatisfy: [ :each | CMarkClassCommentToolMorph shouldBeActivatedInContext: each ]).
+	browser := self browserOnPackage: a package.
+	self assert: (self markdownToolsOf: browser) isEmpty.
+	contexts := browser navigationContexts select: [ :each | each isKindOf: ClyFullBrowserClassContext ].
+	self deny: contexts isEmpty.
+	contexts do: [ :each |
+		self deny: each isClassSelected.
+		self deny: (CMarkClassCommentToolMorph shouldBeActivatedInContext: each) ]
+]
+
+{ #category : 'tests' }
 CMarkClassCommentToolMorphTest >> testBrowserClosingUnsubscribesThePresenter [
 	| browser tool presenter |
 	self requireCanvas.
@@ -150,6 +167,23 @@ CMarkClassCommentToolMorphTest >> testKeepsOneTabWhenTheSystemChanges [
 	browser selectMethod: a >> #scratchMethod.
 	self assert: (self markdownToolsOf: browser) equals: { tool }.
 	self assert: tool isBuilt
+]
+
+{ #category : 'tests' }
+CMarkClassCommentToolMorphTest >> testBelongsToCurrentBrowserContext [
+	"Calypso asks it to rank the tabs and to fill the status bar: the tab belongs to the browser while its class is selected, on either side"
+
+	| a b browser tool |
+	a := self scratchClass: #CMarkCalypsoScratchA comment: 'one'.
+	b := self scratchClass: #CMarkCalypsoScratchB comment: 'two'.
+	browser := self browserOn: a.
+	tool := self markdownToolOf: browser.
+	self assert: tool belongsToCurrentBrowserContext.
+	browser selectClass: a class.
+	self assert: tool belongsToCurrentBrowserContext.
+	browser selectClass: b.
+	self deny: tool belongsToCurrentBrowserContext.
+	self assert: (self markdownToolOf: browser) belongsToCurrentBrowserContext
 ]
 
 { #category : 'tests' }
