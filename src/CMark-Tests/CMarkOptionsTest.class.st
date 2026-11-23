@@ -1,5 +1,5 @@
 "
-I test CMarkOptions: the defaults, the bits of each option and extension against the constants of cmark (docs/CMark.md, Primitive contract), the fresh instances of gfm and commonMark, the unknown extensions, copying, equality and the checks of the setters.
+I test `CMarkOptions`: the defaults, the bits of each option and extension against the constants of cmark (`docs/CMark.md`, Primitive contract), the fresh instances of `gfm` and `commonMark`, the unknown extensions, copying, equality and the checks of the setters.
 "
 Class {
 	#name : 'CMarkOptionsTest',

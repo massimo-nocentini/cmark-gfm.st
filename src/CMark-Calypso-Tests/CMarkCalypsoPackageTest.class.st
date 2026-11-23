@@ -1,5 +1,5 @@
 "
-I check the code of CMark-Calypso and CMark-Calypso-Tests: no method uses an undeclared variable, the scratch classes leave nothing in Undeclared, and every selector that a method sends is implemented somewhere in the image.
+I check the code of `CMark-Calypso` and `CMark-Calypso-Tests`: no method uses an undeclared variable, the scratch classes leave nothing in `Undeclared`, and every selector that a method sends is implemented somewhere in the image.
 "
 Class {
 	#name : 'CMarkCalypsoPackageTest',

@@ -1,7 +1,15 @@
 "
-I am the abstract test of the Markdown tab of Calypso.  My tests make scratch classes (scratchClass:, in the package CMark-Calypso-Tests-Scratch, removed with it by tearDown) whose comments they set and change, so that no class of the image is touched; the presenters they make are unsubscribed by tearDown, and the browsers closed.  The tests run in the Morphic UI process (runCase, inUIProcess:), one after the other with the work that the browsers and windows defer to it; requireUIProcess skips a test that needs it, runUICycle runs that work (one cycle of the world) within a test, and recordingPresenterOn: makes a presenter that records the process of each of its drawings.
+I am the abstract test of the Markdown tab of Calypso.
 
-richComment is a comment with a heading, a list, a code block and a table.
+My tests make scratch classes (`scratchClass:`, in the package `CMark-Calypso-Tests-Scratch`, removed with it by `tearDown`) whose comments they set and change, so that no class of the image is touched; the presenters they make are unsubscribed by `tearDown`, and the browsers closed.
+
+The tests run in the Morphic UI process (`runCase`, `inUIProcess:`), one after the other with the work that the browsers and windows defer to it:
+
+- `requireUIProcess` skips a test that needs it,
+- `runUICycle` runs that work (one cycle of the world) within a test, and
+- `recordingPresenterOn:` makes a presenter that records the process of each of its drawings.
+
+`richComment` is a comment with a heading, a list, a code block and a table.
 "
 Class {
 	#name : 'CMarkCalypsoTestCase',

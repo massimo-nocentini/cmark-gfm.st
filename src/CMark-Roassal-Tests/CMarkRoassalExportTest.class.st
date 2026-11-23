@@ -1,5 +1,5 @@
 "
-I test the exports of CMarkRoassalExporter (requireSurface): a PNG and an SVG of the hand-built document (and of the parsed sample with the plugin) are written, not empty, and the PNG is as large as the composite plus the margin, times the scale (within two pixels, rounded up: the PNG of a cairo surface of 1352@1274 has 1275 rows).
+I test the exports of `CMarkRoassalExporter` (`requireSurface`): a PNG and an SVG of the hand-built document (and of the parsed sample with the plugin) are written, not empty, and the PNG is as large as the composite plus the margin, times the scale (within two pixels, rounded up: the PNG of a cairo surface of `1352@1274` has 1275 rows).
 "
 Class {
 	#name : 'CMarkRoassalExportTest',

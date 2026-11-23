@@ -1,7 +1,12 @@
 "
-I am the context of a block in the Roassal rendering: the width available to it, the base style of its text (muted in block quotes, bold in header rows, smaller in footnote definitions), the depth of lists, of bullet lists and of quotes around it, and its nesting (the number of blocks around it).
+I am the context of a block in the Roassal rendering:
 
-I am immutable: the with...: messages answer modified copies.  The renderer passes me down its recursion and keeps the current one only for the duration of one visit (restored in an ensure:), so a non-local return or an error never leaves a wrong context behind.
+- the width available to it,
+- the base style of its text (muted in block quotes, bold in header rows, smaller in footnote definitions),
+- the depth of lists, of bullet lists and of quotes around it, and
+- its nesting (the number of blocks around it).
+
+I am immutable: the `with...:` messages answer modified copies. The renderer passes me down its recursion and keeps the current one only for the duration of one visit (restored in an `ensure:`), so a non-local return or an error never leaves a wrong context behind.
 "
 Class {
 	#name : 'CMarkRoassalContext',

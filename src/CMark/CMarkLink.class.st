@@ -1,7 +1,9 @@
 "
-I am a link: my children are its text (inlines), url its destination, title its title ('' when absent).  The autolinks (<https://x.y>, www.x.y, emails) are links too, which the tape cannot tell apart.
+I am a link: my children are its text (inlines), `url` its destination, `title` its title (`''` when absent). The autolinks (`<https://x.y>`, `www.x.y`, emails) are links too, which the tape cannot tell apart.
 
-	CMarkLink url: 'https://pharo.org' title: ''
+```smalltalk
+CMarkLink url: 'https://pharo.org' title: ''
+```
 "
 Class {
 	#name : 'CMarkLink',

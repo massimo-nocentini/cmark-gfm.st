@@ -1,5 +1,5 @@
 "
-I check the invariants of a rendering on the hand-built document of CMarkRoassalExamples (and on the parsed sample when the plugin is there): the models, one frame per block node, the labels, the composites that contain their children and were never given an extent, the width, every node class rendered alone, and determinism.
+I check the invariants of a rendering on the hand-built document of `CMarkRoassalExamples` (and on the parsed sample when the plugin is there): the models, one frame per block node, the labels, the composites that contain their children and were never given an extent, the width, every node class rendered alone, and determinism.
 "
 Class {
 	#name : 'CMarkRoassalStructureTest',

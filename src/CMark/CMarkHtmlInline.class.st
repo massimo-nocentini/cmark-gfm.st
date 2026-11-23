@@ -1,7 +1,9 @@
 "
-I am a raw HTML tag, comment or declaration inside a paragraph: literal is the HTML as written.  Nothing interprets or runs it.
+I am a raw HTML tag, comment or declaration inside a paragraph: `literal` is the HTML as written. Nothing interprets or runs it.
 
-	CMarkHtmlInline literal: 'x'
+```smalltalk
+CMarkHtmlInline literal: 'x'
+```
 "
 Class {
 	#name : 'CMarkHtmlInline',

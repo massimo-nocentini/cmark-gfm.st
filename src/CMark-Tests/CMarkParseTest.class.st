@@ -1,5 +1,11 @@
 "
-I test parsing through the CMarkPlugin (each test calls requirePlugin): the tree of the sample (classes, parents and positions against the golden tree of the C tests, the character indices against the byte columns, the attributes of each construct), the kinds of sources (ByteString, WideString, ByteArray, Latin-1, NUL, CR LF, invalid UTF-8), footnotes in the moved order, the options and the extensions per call, and the limits (maxDepth, maxInputSize, cBudget).
+I test parsing through the `CMarkPlugin` (each test calls `requirePlugin`):
+
+- the tree of the sample (classes, parents and positions against the golden tree of the C tests, the character indices against the byte columns, the attributes of each construct),
+- the kinds of sources (ByteString, WideString, ByteArray, Latin-1, NUL, CR LF, invalid UTF-8),
+- footnotes in the moved order,
+- the options and the extensions per call, and
+- the limits (`maxDepth`, `maxInputSize`, `cBudget`).
 "
 Class {
 	#name : 'CMarkParseTest',

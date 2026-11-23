@@ -1,7 +1,15 @@
 "
-I am a code block: literal is my content (each line ends with a line feed), info the info string of a fenced block ('' for an indented one), language its first word.  fenced says whether I am fenced; fenceLength, fenceCharacter ($` or $~, nil when indented) and fenceOffset describe the fence.
+I am a code block:
 
-	CMarkCodeBlock literal: 'x := 1.' , String lf info: 'smalltalk'
+- `literal` is my content (each line ends with a line feed);
+- `info` the info string of a fenced block (`''` for an indented one);
+- `language` its first word.
+
+`fenced` says whether I am fenced; `fenceLength`, `fenceCharacter` (a Character: \` or `$~`, nil when indented) and `fenceOffset` describe the fence.
+
+```smalltalk
+CMarkCodeBlock literal: 'x := 1.' , String lf info: 'smalltalk'
+```
 "
 Class {
 	#name : 'CMarkCodeBlock',

@@ -1,17 +1,36 @@
 "
-I render a tree of CMarkNodes as one RSComposite whose model is the node: a document gives the whole page (padding, background, footnote definitions last under a thin rule), any other node renders alone at maxWidth.
+I render a tree of `CMarkNode`s as one `RSComposite` whose model is the node: a document gives the whole page (padding, background, footnote definitions last under a thin rule), any other node renders alone at `maxWidth`.
 
-	(CMark parse: '# Hello *world*') asRoassalShape.
-	CMarkRoassalRenderer new theme: CMarkRoassalTheme dark; maxWidth: 480; render: aNode.
-	(CMarkRoassalRenderer new canvasFor: aDocument) open.
+```smalltalk
+(CMark parse: '# Hello *world*') asRoassalShape.
+CMarkRoassalRenderer new
+	theme: CMarkRoassalTheme dark;
+	maxWidth: 480;
+	render: aNode.
+(CMarkRoassalRenderer new canvasFor: aDocument) open.
+```
 
-Every visit answers a CMarkRoassalBlock: an RSComposite whose top-left is its local 0@0 and whose first child is a transparent frame box (0@0 to the available width @ the height, noPaint, model the node, property #cmarkFrame): it gives exact extents, backgrounds that span the column and a hit area.  Composites clip their children to their own rectangle, so a block composite never gets extent:, only adjustToChildren; the one clipping composite is a code block under the codeWrap #clip of the theme.  My visitNode: (the default of every visit I do not override) answers the stacked blocks of the children, so no visit answers a node.
+## Blocks
 
-The context of a block (CMarkRoassalContext: available width, base style, list, bullet and quote depths, nesting) is passed down immutable and kept in my context only for one visit.  Inline content is flattened by CMarkInlineRunCollector and laid out by CMarkInlineFlow.  Measures are cached per rendering by CMarkRoassalFonts and dropped at the end of render:; the LogicalFonts are made once for the image.
+Every visit answers a `CMarkRoassalBlock`: an `RSComposite` whose top-left is its local `0@0` and whose first child is a transparent frame box (`0@0` to the available width @ the height, `noPaint`, model the node, property `#cmarkFrame`): it gives exact extents, backgrounds that span the column and a hit area.
 
-Budgets (CMarkRoassalTheme): blocks deeper than maxNesting are rendered flat (their cmarkRoassalFlatText in a muted paragraph); when maxShapes shapes exist, no more blocks are made, nor lines of code, of raw HTML or of inline text, nor table rows (a block always gets its first line or row), and the page ends with one muted paragraph 'N more blocks not shown', where N counts the blocks left out, the footnote definitions among them, and one for each block cut short; a table of more than maxTableCells cells is a placeholder.
+Composites clip their children to their own rectangle, so a block composite never gets `extent:`, only `adjustToChildren`; the one clipping composite is a code block under the `codeWrap` `#clip` of the theme. My `visitNode:` (the default of every visit I do not override) answers the stacked blocks of the children, so no visit answers a node.
 
-Interactions: every piece inside a link (labels, code chips, images) and every footnote reference shares one RSPopup and has a click subscription made with when:do:for: (never the deprecated when:do:, which rewrites the sender at run time).  A click on an anchor link (#slug) or on a footnote reference moves the camera of the canvas to the heading or the definition; other links go to the linkAction of the theme.  canvasFor: fits the width and shows the top of the document instead of zooming to fit.
+The context of a block (`CMarkRoassalContext`: available width, base style, list, bullet and quote depths, nesting) is passed down immutable and kept in my `context` only for one visit. Inline content is flattened by `CMarkInlineRunCollector` and laid out by `CMarkInlineFlow`. Measures are cached per rendering by `CMarkRoassalFonts` and dropped at the end of `render:`; the `LogicalFont`s are made once for the image.
+
+## Budgets (`CMarkRoassalTheme`)
+
+- Blocks deeper than `maxNesting` are rendered flat (their `cmarkRoassalFlatText` in a muted paragraph);
+- when `maxShapes` shapes exist, no more blocks are made, nor lines of code, of raw HTML or of inline text, nor table rows (a block always gets its first line or row), and the page ends with one muted paragraph 'N more blocks not shown', where N counts the blocks left out, the footnote definitions among them, and one for each block cut short;
+- a table of more than `maxTableCells` cells is a placeholder.
+
+## Interactions
+
+Every piece inside a link (labels, code chips, images) and every footnote reference shares one `RSPopup` and has a click subscription made with `when:do:for:` (never the deprecated `when:do:`, which rewrites the sender at run time).
+
+A click on an anchor link (`#slug`) or on a footnote reference moves the camera of the canvas to the heading or the definition; other links go to the `linkAction` of the theme.
+
+`canvasFor:` fits the width and shows the top of the document instead of zooming to fit.
 "
 Class {
 	#name : 'CMarkRoassalRenderer',

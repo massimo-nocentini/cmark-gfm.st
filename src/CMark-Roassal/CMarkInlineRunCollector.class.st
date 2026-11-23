@@ -1,7 +1,15 @@
 "
-I flatten the inline children of a block into CMarkInlineRuns for CMarkInlineFlow.
+I flatten the inline children of a block into `CMarkInlineRun`s for `CMarkInlineFlow`.
 
-I walk the inlines with an explicit stack, never recursively, so 2000 nested emphases cost no Smalltalk stack.  Each visit answers the style for the children of its node, or nil when the node has no children to walk: visitEmph:, visitStrong:, visitStrikethrough: and visitLink: derive a style (italic, bold, strike, the link look) and the children are walked with it, so the style is popped when they are done.  Beyond the maxNesting of the theme the style stops changing.  The leaves add runs: texts, soft and line breaks (a soft break is a line break when the document was parsed with hardBreaks), code spans, raw HTML (by the htmlStyle of the theme, through CMarkHtmlLite), images and footnote references (atoms and raised labels made by the renderer).
+I walk the inlines with an explicit stack, never recursively, so 2000 nested emphases cost no Smalltalk stack. Each visit answers the style for the children of its node, or nil when the node has no children to walk: `visitEmph:`, `visitStrong:`, `visitStrikethrough:` and `visitLink:` derive a style (italic, bold, strike, the link look) and the children are walked with it, so the style is popped when they are done. Beyond the `maxNesting` of the theme the style stops changing.
+
+The leaves add runs:
+
+- texts,
+- soft and line breaks (a soft break is a line break when the document was parsed with `hardBreaks`),
+- code spans,
+- raw HTML (by the `htmlStyle` of the theme, through `CMarkHtmlLite`),
+- images and footnote references (atoms and raised labels made by the renderer).
 "
 Class {
 	#name : 'CMarkInlineRunCollector',

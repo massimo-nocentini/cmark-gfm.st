@@ -1,9 +1,9 @@
 "
-I am the examples of the Roassal rendering of Markdown.  Each example method opens a canvas (with open) and answers it; the canvas... methods build the same canvases without opening them.
+I am the examples of the Roassal rendering of Markdown. Each example method opens a canvas (with `open`) and answers it; the `canvas...` methods build the same canvases without opening them.
 
-- exampleHandBuilt: a document built by hand with the node API (no plugin needed);
-- exampleSample, exampleDark, exampleNarrow (320 units wide), exampleTable, exampleTasks: parsed by the CMarkPlugin;
-- exampleReadme: the README.md of the cmark-gfm.st checkout, found through the Iceberg repository named cmark-gfm.st, else through the CMARK_PLUGIN_DIR environment variable (<dir>/cmark-gfm.st/README.md), else the sample (a tonel:// load registers no Iceberg repository).
+- `exampleHandBuilt`: a document built by hand with the node API (no plugin needed);
+- `exampleSample`, `exampleDark`, `exampleNarrow` (320 units wide), `exampleTable`, `exampleTasks`: parsed by the `CMarkPlugin`;
+- `exampleReadme`: the `README.md` of the `cmark-gfm.st` checkout, found through the Iceberg repository named `cmark-gfm.st`, else through the `CMARK_PLUGIN_DIR` environment variable (`<dir>/cmark-gfm.st/README.md`), else the sample (a `tonel://` load registers no Iceberg repository).
 "
 Class {
 	#name : 'CMarkRoassalExamples',

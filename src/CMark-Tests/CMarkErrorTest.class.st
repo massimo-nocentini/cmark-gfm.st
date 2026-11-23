@@ -1,5 +1,5 @@
 "
-I test the errors of CMark: all under CMarkError, their accessors and messages, and the reasons of CMarkMemoryLimit.
+I test the errors of CMark: all under `CMarkError`, their accessors and messages, and the reasons of `CMarkMemoryLimit`.
 "
 Class {
 	#name : 'CMarkErrorTest',

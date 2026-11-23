@@ -1,5 +1,5 @@
 "
-I record every message I do not understand: given to acceptCMarkVisitor:, I tell which visit method a node class sends.
+I record every message I do not understand: given to `acceptCMarkVisitor:`, I tell which visit method a node class sends.
 "
 Class {
 	#name : 'CMarkSelectorRecorder',

@@ -1,7 +1,9 @@
 "
-I am a code span: literal is the code, its outer spaces stripped as CommonMark says.
+I am a code span: `literal` is the code, its outer spaces stripped as CommonMark says.
 
-	CMarkCode literal: 'x'
+```smalltalk
+CMarkCode literal: 'x'
+```
 "
 Class {
 	#name : 'CMarkCode',

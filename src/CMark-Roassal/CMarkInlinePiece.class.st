@@ -1,5 +1,7 @@
 "
-I am a piece of a line of CMarkInlineFlow: a word of text (#word), a segment of a code span (#chip) or an atom (#atom, an image or its placeholder), with its style, its node, its advance (width), and the part of it above (ascent) and below (descent) the baseline.  A chip knows whether it is the first and the last segment of its code span (its box is padded and rounded only at the outer ends) and how wide its padding is.
+I am a piece of a line of `CMarkInlineFlow`: a word of text (`#word`), a segment of a code span (`#chip`) or an atom (`#atom`, an image or its placeholder), with its style, its node, its advance (`width`), and the part of it above (`ascent`) and below (`descent`) the baseline.
+
+A chip knows whether it is the first and the last segment of its code span (its box is padded and rounded only at the outer ends) and how wide its padding is.
 "
 Class {
 	#name : 'CMarkInlinePiece',

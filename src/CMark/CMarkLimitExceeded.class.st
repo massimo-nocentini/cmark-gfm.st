@@ -1,5 +1,5 @@
 "
-I am the abstract error of a limit that a parse or a render went over: limit is the limit (nil when it is not known), actual the size or depth reached (nil when it is not known).  My subclasses say which limit.
+I am the abstract error of a limit that a parse or a render went over: `limit` is the limit (nil when it is not known), `actual` the size or depth reached (nil when it is not known). My subclasses say which limit.
 "
 Class {
 	#name : 'CMarkLimitExceeded',

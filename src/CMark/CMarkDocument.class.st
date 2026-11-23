@@ -1,9 +1,15 @@
 "
-I am the root of a parse tree: my children are the blocks of the source.  I keep the source I was parsed from (a String or a ByteArray of UTF-8), the CMarkOptions, the node count and the depth of the deepest node (treeDepth) of the answer of the plugin.  sourceString is the source as a String, against which the startIndex and endIndex of every node count: the source itself when it is a String; for a ByteArray, decoded from the sanitised bytes of the plugin when the source was not valid UTF-8 (each bad byte is one U+FFFD there, and NUL is U+FFFD), else from the source.
+I am the root of a parse tree: my children are the blocks of the source.
 
-	CMarkDocument source: '# Hi'
+I keep the source I was parsed from (a String or a ByteArray of UTF-8), the `CMarkOptions`, the node count and the depth of the deepest node (`treeDepth`) of the answer of the plugin.
 
-answers a hand-built document, with no children and no positions.  The footnote definitions that cmark resolved come last, in the order of their first reference.
+`sourceString` is the source as a String, against which the `startIndex` and `endIndex` of every node count: the source itself when it is a String; for a ByteArray, decoded from the sanitised bytes of the plugin when the source was not valid UTF-8 (each bad byte is one U+FFFD there, and NUL is U+FFFD), else from the source.
+
+```smalltalk
+CMarkDocument source: '# Hi'
+```
+
+answers a hand-built document, with no children and no positions. The footnote definitions that cmark resolved come last, in the order of their first reference.
 "
 Class {
 	#name : 'CMarkDocument',

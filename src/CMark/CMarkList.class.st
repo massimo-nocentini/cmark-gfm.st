@@ -1,8 +1,17 @@
 "
-I am a list: my children are CMarkItems (CMarkTaskItems for the task list items).  listType is #bullet or #ordered, delimiter #period, #paren or nil (bullets), start the number of the first ordered item (0 for bullets), tight whether cmark found no blank line between and inside the items.  The bullet character (- * +) is private to cmark and not in the tape.
+I am a list: my children are `CMarkItem`s (`CMarkTaskItem`s for the task list items).
 
-	CMarkList bullet
-	CMarkList ordered: 3
+- `listType` is `#bullet` or `#ordered`;
+- `delimiter` `#period`, `#paren` or nil (bullets);
+- `start` the number of the first ordered item (0 for bullets);
+- `tight` whether cmark found no blank line between and inside the items.
+
+The bullet character (`-` `*` `+`) is private to cmark and not in the tape.
+
+```smalltalk
+CMarkList bullet
+CMarkList ordered: 3
+```
 "
 Class {
 	#name : 'CMarkList',

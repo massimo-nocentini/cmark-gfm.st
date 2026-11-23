@@ -1,13 +1,20 @@
 "
-I am the facade of CMark, on my class side only: I parse Markdown into a tree of CMarkNodes and render it to text through the CMarkPlugin of the VM, by delegating to CMarkParser and CMarkFormatter.
+I am the facade of CMark, on my class side only: I parse Markdown into a tree of `CMarkNode`s and render it to text through the `CMarkPlugin` of the VM, by delegating to `CMarkParser` and `CMarkFormatter`.
 
-	CMark parse: '# Hello *world*'.                            ""a CMarkDocument, with CMarkOptions gfm""
-	CMark parse: aString options: (CMarkOptions commonMark smart: true).
-	CMark html: '# Hi'.                                         ""'<h1>Hi</h1>', LF""
-	CMark render: '# Hi' format: #latex.                        ""#html #xml #commonmark #plaintext #latex #man""
-	CMark isAvailable.  CMark version.  CMark statistics.
+```smalltalk
+CMark parse: '# Hello *world*'.
+	""a CMarkDocument, with CMarkOptions gfm""
+CMark
+	parse: aString
+	options: (CMarkOptions commonMark smart: true).
+CMark html: '# Hi'.
+	""'<h1>Hi</h1>', LF""
+CMark render: '# Hi' format: #latex.
+	""#html #xml #commonmark #plaintext #latex #man""
+CMark isAvailable.  CMark version.  CMark statistics.
+```
 
-Without the plugin, parsing and rendering signal CMarkUnavailable; hand-built trees need no plugin.
+Without the plugin, parsing and rendering signal `CMarkUnavailable`; hand-built trees need no plugin.
 "
 Class {
 	#name : 'CMark',

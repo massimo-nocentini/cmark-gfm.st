@@ -1,5 +1,5 @@
 "
-I hold the Markdown fixtures of the tests, on my class side, as Strings with LF line ends.  They are our own text: no CommonMark or GFM spec text is copied (CC-BY-SA).  sample is the text of tests/fixtures/sample.md of the CMarkPlugin (pharo-vm): keep the two equal.
+I hold the Markdown fixtures of the tests, on my class side, as Strings with LF line ends. They are our own text: no CommonMark or GFM spec text is copied (CC-BY-SA). `sample` is the text of `tests/fixtures/sample.md` of the `CMarkPlugin` (pharo-vm): keep the two equal.
 "
 Class {
 	#name : 'CMarkFixtures',

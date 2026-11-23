@@ -1,5 +1,5 @@
 "
-I am a soft line break (a newline inside a paragraph): the renders make me a space or a newline (hardBreaks, noBreaks).  cmark gives me no position.
+I am a soft line break (a newline inside a paragraph): the renders make me a space or a newline (`hardBreaks`, `noBreaks`). cmark gives me no position.
 "
 Class {
 	#name : 'CMarkSoftBreak',

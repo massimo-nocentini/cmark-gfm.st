@@ -1,7 +1,13 @@
 "
-I am the abstract test of the Roassal rendering.  My tests build their trees by hand (no plugin needed) or parse them with requirePlugin.  requireCanvas skips when RSCanvas new raises (the stock image of the WebAssembly VM has no world surface) and requireSurface when no cairo surface can be made; the shape tests (composites, labels, metrics) need neither.
+I am the abstract test of the Roassal rendering. My tests build their trees by hand (no plugin needed) or parse them with `requirePlugin`. `requireCanvas` skips when `RSCanvas new` raises (the stock image of the WebAssembly VM has no world surface) and `requireSurface` when no cairo surface can be made; the shape tests (composites, labels, metrics) need neither.
 
-Helpers: render: (with the renderer kept in renderer), walk:do: (every shape of a rendering with its rectangle in the coordinates of the root, iteratively), labelsOf:, framesOf:, dump: (the golden structural dump: one line per shape, its class, the typeName of its model, its bounds rounded to 0.5 and the text of a label, non-ASCII characters escaped), and small builders of nodes (text:, paragraph:, document:).
+Helpers:
+
+- `render:` (with the renderer kept in `renderer`),
+- `walk:do:` (every shape of a rendering with its rectangle in the coordinates of the root, iteratively),
+- `labelsOf:`, `framesOf:`,
+- `dump:` (the golden structural dump: one line per shape, its class, the `typeName` of its model, its bounds rounded to 0.5 and the text of a label, non-ASCII characters escaped), and
+- small builders of nodes (`text:`, `paragraph:`, `document:`).
 "
 Class {
 	#name : 'CMarkRoassalTestCase',

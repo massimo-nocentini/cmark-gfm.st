@@ -1,7 +1,9 @@
 "
-I am a table of the table extension: my children are rows, the first one the CMarkTableHeaderRow.  columnCount is my number of columns, alignments an Array of #left, #center, #right or nil (none) per column.
+I am a table of the table extension: my children are rows, the first one the `CMarkTableHeaderRow`. `columnCount` is my number of columns, `alignments` an Array of `#left`, `#center`, `#right` or nil (none) per column.
 
-	CMarkTable alignments: #( #left nil #right )
+```smalltalk
+CMarkTable alignments: #( #left nil #right )
+```
 "
 Class {
 	#name : 'CMarkTable',

@@ -1,5 +1,5 @@
 "
-I stand for the inspector's StInspectionContext: I record what active: was given.
+I stand for the inspector's `StInspectionContext`: I record what `active:` was given.
 "
 Class {
 	#name : 'CMarkContextStub',

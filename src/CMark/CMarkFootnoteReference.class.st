@@ -1,5 +1,11 @@
 "
-I am a reference to a footnote ([^label]), parsed only with the option footnotes: ordinal is the number of my definition, definition my CMarkFootnoteDefinition, referenceIndex my rank among the references to it that are in the tree (1 for the first, in source order; see referenceIndex for where it differs from cmark's numbering).  A reference without a definition is the text [^label] instead.
+I am a reference to a footnote (`[^label]`), parsed only with the option `footnotes`:
+
+- `ordinal` is the number of my definition;
+- `definition` my `CMarkFootnoteDefinition`;
+- `referenceIndex` my rank among the references to it that are in the tree (1 for the first, in source order; see `referenceIndex` for where it differs from cmark's numbering).
+
+A reference without a definition is the text `[^label]` instead.
 "
 Class {
 	#name : 'CMarkFootnoteReference',

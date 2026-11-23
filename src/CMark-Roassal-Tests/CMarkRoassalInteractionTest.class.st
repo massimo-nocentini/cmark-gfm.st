@@ -1,5 +1,11 @@
 "
-I test the interactions of the rendering and the hygiene of the package: one shared RSPopup on every piece of a link (labels, code chips, images) and on footnote references, a click subscription made with when:do:for: (the renderer is the subscriber), popup texts, link actions, and no sender of the deprecated when:do: in CMark-Roassal (which would rewrite the package at run time and leave it dirty).
+I test the interactions of the rendering and the hygiene of the package:
+
+- one shared `RSPopup` on every piece of a link (labels, code chips, images) and on footnote references,
+- a click subscription made with `when:do:for:` (the renderer is the subscriber),
+- popup texts,
+- link actions, and
+- no sender of the deprecated `when:do:` in `CMark-Roassal` (which would rewrite the package at run time and leave it dirty).
 "
 Class {
 	#name : 'CMarkRoassalInteractionTest',

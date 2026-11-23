@@ -1,5 +1,10 @@
 "
-I test the budget loop of CMarkPrimitives with the plugin (each test calls requirePlugin): a refused answer (status 1, forced with the test hook #budget) makes the loop grow the object memory and call again, which the plugin answers from the result it kept, without parsing again; an exception inside the loop releases that result; a large document parses; and the C budget stops a CommonMark render that would blow up.
+I test the budget loop of `CMarkPrimitives` with the plugin (each test calls `requirePlugin`):
+
+- a refused answer (status 1, forced with the test hook `#budget`) makes the loop grow the object memory and call again, which the plugin answers from the result it kept, without parsing again;
+- an exception inside the loop releases that result;
+- a large document parses; and
+- the C budget stops a CommonMark render that would blow up.
 "
 Class {
 	#name : 'CMarkBudgetTest',

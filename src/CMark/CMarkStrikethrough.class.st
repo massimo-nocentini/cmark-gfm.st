@@ -1,5 +1,5 @@
 "
-I am struck text of the strikethrough extension (~~x~~, or ~x~ unless strikethroughDoubleTilde): my children are inlines.
+I am struck text of the strikethrough extension (`~~x~~`, or `~x~` unless `strikethroughDoubleTilde`): my children are inlines.
 "
 Class {
 	#name : 'CMarkStrikethrough',

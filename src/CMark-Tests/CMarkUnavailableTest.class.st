@@ -1,5 +1,5 @@
 "
-I test what CMark does without the plugin: with the test hook #pluginMissing (or on a VM that has no CMarkPlugin), parsing and rendering signal CMarkUnavailable and the rest works; with the test hook #protocol, a plugin of another protocol is refused.  I need no plugin.
+I test what CMark does without the plugin: with the test hook `#pluginMissing` (or on a VM that has no `CMarkPlugin`), parsing and rendering signal `CMarkUnavailable` and the rest works; with the test hook `#protocol`, a plugin of another protocol is refused. I need no plugin.
 "
 Class {
 	#name : 'CMarkUnavailableTest',

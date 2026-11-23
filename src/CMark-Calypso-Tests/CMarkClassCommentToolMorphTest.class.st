@@ -1,5 +1,8 @@
 "
-I test CMarkClassCommentToolMorph, the Markdown tab of Calypso: its title, icon, tabOrder (strictly after the Comment tab of Calypso and before the UML-Class tab of Roassal), activationPriority and activation, and, in a real ClyFullBrowserMorph on a scratch class, that the tab is there only for a commented class, between Comment and UML-Class (when Roassal-UML-Calypso is loaded), not selected by default, that it draws the comment, that Calypso keeps one tab through the changes of the system and removes it with its class or its comment, and that its presenter stops listening when the tab is removed or the browser closes.
+I test `CMarkClassCommentToolMorph`, the Markdown tab of Calypso:
+
+- its title, icon, `tabOrder` (strictly after the Comment tab of Calypso and before the UML-Class tab of Roassal), `activationPriority` and activation, and,
+- in a real `ClyFullBrowserMorph` on a scratch class, that the tab is there only for a commented class, between Comment and UML-Class (when `Roassal-UML-Calypso` is loaded), not selected by default, that it draws the comment, that Calypso keeps one tab through the changes of the system and removes it with its class or its comment, and that its presenter stops listening when the tab is removed or the browser closes.
 "
 Class {
 	#name : 'CMarkClassCommentToolMorphTest',

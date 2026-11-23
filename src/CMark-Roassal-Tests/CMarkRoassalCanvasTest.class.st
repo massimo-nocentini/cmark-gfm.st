@@ -1,5 +1,5 @@
 "
-I test the canvas of a rendering (requireCanvas): canvasFor: fits the width of the view and shows the top-left of the document, and a click on an anchor link or on a footnote reference moves the camera to its target.
+I test the canvas of a rendering (`requireCanvas`): `canvasFor:` fits the width of the view and shows the top-left of the document, and a click on an anchor link or on a footnote reference moves the camera to its target.
 "
 Class {
 	#name : 'CMarkRoassalCanvasTest',

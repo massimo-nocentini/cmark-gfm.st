@@ -1,10 +1,20 @@
 "
-I am the theme of the Roassal rendering of Markdown (CMarkRoassalRenderer): fonts, sizes, colours, gaps, list and quote indents, code and table looks, the treatment of raw HTML and of long code lines, the budgets of the rendering (maxNesting, maxShapes, maxTableCells), what a click on a link does (linkAction) and how images are found (imageResolver).
+I am the theme of the Roassal rendering of Markdown (`CMarkRoassalRenderer`): fonts, sizes, colours, gaps, list and quote indents, code and table looks, the treatment of raw HTML and of long code lines, the budgets of the rendering (`maxNesting`, `maxShapes`, `maxTableCells`), what a click on a link does (`linkAction`) and how images are found (`imageResolver`).
 
-CMarkRoassalTheme default is the light GitHub-like look; dark changes the colours; compact lowers the gaps.  Every parameter has an accessor and a setter, so a theme is built by sending setters to one of these:
-	CMarkRoassalTheme default fontSize: 14; maxWidth: 480; yourself
+`CMarkRoassalTheme default` is the light GitHub-like look; `dark` changes the colours; `compact` lowers the gaps. Every parameter has an accessor and a setter, so a theme is built by sending setters to one of these:
 
-The parameters: sansFamily; monoFamily; fontSize; headingScales; monoScale; textColor; mutedColor; linkColor; codeBackground; borderColor; quoteBarColor; tableHeaderBackground; tableZebra; background; maxWidth; padding; blockGap; tightGap; lineGap; listIndent; markerGap; quoteIndent; quoteBarWidth; codePadding; cornerRadius; cellPadding; ruleThickness; headingRuleThickness; bulletStyles; superscriptScale; superscriptRaise; htmlStyle; codeWrap; breakLongWords; maxNesting; maxShapes; maxTableCells; linkAction; imageResolver.
+```smalltalk
+CMarkRoassalTheme default fontSize: 14; maxWidth: 480; yourself
+```
+
+The parameters:
+
+- `sansFamily`; `monoFamily`; `fontSize`; `headingScales`; `monoScale`;
+- `textColor`; `mutedColor`; `linkColor`; `codeBackground`; `borderColor`; `quoteBarColor`; `tableHeaderBackground`; `tableZebra`; `background`;
+- `maxWidth`; `padding`; `blockGap`; `tightGap`; `lineGap`; `listIndent`; `markerGap`; `quoteIndent`; `quoteBarWidth`; `codePadding`; `cornerRadius`; `cellPadding`; `ruleThickness`; `headingRuleThickness`;
+- `bulletStyles`; `superscriptScale`; `superscriptRaise`; `htmlStyle`; `codeWrap`; `breakLongWords`;
+- `maxNesting`; `maxShapes`; `maxTableCells`;
+- `linkAction`; `imageResolver`.
 "
 Class {
 	#name : 'CMarkRoassalTheme',

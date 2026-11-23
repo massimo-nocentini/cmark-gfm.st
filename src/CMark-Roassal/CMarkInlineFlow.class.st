@@ -1,14 +1,14 @@
 "
-I lay out the inline content of one block (the CMarkInlineRuns of CMarkInlineRunCollector) as lines of Roassal shapes, at a given width.  I do not use RSFlowLayout: it wraps on ink widths with one constant gap and cannot align mixed fonts on a baseline.
+I lay out the inline content of one block (the `CMarkInlineRun`s of `CMarkInlineRunCollector`) as lines of Roassal shapes, at a given width. I do not use `RSFlowLayout`: it wraps on ink widths with one constant gap and cannot align mixed fonts on a baseline.
 
 1. The runs become pieces: words (text split at blanks, which are exactly space, TAB, CR and LF and collapse; U+00A0 is not a blank), chips (a code span split at its spaces, each segment keeping its spacing) and atoms (images, placeholders).
-2. Break opportunities exist only at blanks, soft and line breaks, and between the segments of a code span.  The pieces between two opportunities form one cluster (CMarkInlineCluster), across runs and atoms: [link](u). stays together.  A width is the sum of the advances per character (CMarkRoassalFonts), never RSLabel>>width.
-3. Greedy breaking: a cluster moves to the next line when it does not fit and the line is not empty.  An overlong cluster overflows, or breaks by characters when the theme says breakLongWords.
-4. On a line, consecutive words of the same run merge into one RSLabel (continuous underline and strike, far fewer shapes), and consecutive segments of one code span share one chip box (rounded and padded only at the ends of the span).  No label is ever made of an empty string.
-5. Each line takes the largest ascent and descent of its pieces (and of the base font, so an empty line has the height of a line of the base font); every piece sits on the common baseline.  Lines are lineGap apart.  Lines are aligned left, centred or right (table cells).
-6. The shape budget of the renderer (maxShapes) cuts my lines: once it is spent, no line after the first is made, and the renderer counts the block as cut short (budgeted: false exempts the messages of the budgets).
+2. Break opportunities exist only at blanks, soft and line breaks, and between the segments of a code span. The pieces between two opportunities form one cluster (`CMarkInlineCluster`), across runs and atoms: `[link](u).` stays together. A width is the sum of the advances per character (`CMarkRoassalFonts`), never `RSLabel>>width`.
+3. Greedy breaking: a cluster moves to the next line when it does not fit and the line is not empty. An overlong cluster overflows, or breaks by characters when the theme says `breakLongWords`.
+4. On a line, consecutive words of the same run merge into one `RSLabel` (continuous underline and strike, far fewer shapes), and consecutive segments of one code span share one chip box (rounded and padded only at the ends of the span). No label is ever made of an empty string.
+5. Each line takes the largest ascent and descent of its pieces (and of the base font, so an empty line has the height of a line of the base font); every piece sits on the common baseline. Lines are `lineGap` apart. Lines are aligned left, centred or right (table cells).
+6. The shape budget of the renderer (`maxShapes`) cuts my lines: once it is spent, no line after the first is made, and the renderer counts the block as cut short (`budgeted: false` exempts the messages of the budgets).
 
-After layoutWidth:alignment:node: I answer my shapes (in local coordinates, the top-left of the first line at 0@0), my height, the y of my first baseline, the number and widths of my lines.  naturalWidth (the width of the widest line at an unlimited width) and minWidth (the widest cluster) need no layout: tables ask them first.
+After `layoutWidth:alignment:node:` I answer my shapes (in local coordinates, the top-left of the first line at `0@0`), my height, the y of my first baseline, the number and widths of my lines. `naturalWidth` (the width of the widest line at an unlimited width) and `minWidth` (the widest cluster) need no layout: tables ask them first.
 "
 Class {
 	#name : 'CMarkInlineFlow',

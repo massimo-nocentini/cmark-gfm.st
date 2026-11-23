@@ -1,5 +1,16 @@
 "
-I test the block layout rules: code blocks (tabs, the final line feed, codeWrap), tables (alignment, automatic widths, overflow, the cell budget), lists (ordered markers, wide starts, task boxes), headings, quotes nested deeper than maxNesting, the shape budget, images (placeholders, files relative to the base directory, scaling), raw HTML by htmlStyle, the font fallback, and the overflow cases of the width.
+I test the block layout rules:
+
+- code blocks (tabs, the final line feed, `codeWrap`),
+- tables (alignment, automatic widths, overflow, the cell budget),
+- lists (ordered markers, wide starts, task boxes),
+- headings,
+- quotes nested deeper than `maxNesting`,
+- the shape budget,
+- images (placeholders, files relative to the base directory, scaling),
+- raw HTML by `htmlStyle`,
+- the font fallback, and
+- the overflow cases of the width.
 "
 Class {
 	#name : 'CMarkRoassalBlockTest',

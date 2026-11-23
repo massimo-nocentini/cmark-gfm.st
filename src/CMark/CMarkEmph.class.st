@@ -1,5 +1,5 @@
 "
-I am emphasis (*x* or _x_): my children are inlines.
+I am emphasis (`*x*` or `_x_`): my children are inlines.
 "
 Class {
 	#name : 'CMarkEmph',

@@ -1,5 +1,7 @@
 "
-I am the abstract test of CMark, with the time limit of the slow WebAssembly VMs, and helpers to make strings of code points.  requirePlugin skips a test that needs the CMarkPlugin when the VM has none (or it is hidden by the test hook #pluginMissing); tearDown removes every test hook of CMarkPrimitives.
+I am the abstract test of CMark, with the time limit of the slow WebAssembly VMs, and helpers to make strings of code points.
+
+`requirePlugin` skips a test that needs the `CMarkPlugin` when the VM has none (or it is hidden by the test hook `#pluginMissing`); `tearDown` removes every test hook of `CMarkPrimitives`.
 "
 Class {
 	#name : 'CMarkTestCase',

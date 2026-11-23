@@ -1,5 +1,5 @@
 "
-I am a block of a type that the tape has no code for (a newer cmark, or an extension that CMark does not know): rawType is the type of cmark, typeString its name.  My children are kept.
+I am a block of a type that the tape has no code for (a newer cmark, or an extension that CMark does not know): `rawType` is the type of cmark, `typeString` its name. My children are kept.
 "
 Class {
 	#name : 'CMarkUnknownBlock',

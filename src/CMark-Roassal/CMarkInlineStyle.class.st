@@ -1,7 +1,13 @@
 "
-I am the style of a piece of inline text in the Roassal rendering: the font family and size, bold, italic, strike, underline, the colour and the background, whether the text is code (mono), the node that a click follows (link: a CMarkLink or a CMarkFootnoteReference), and how far the text is raised above the baseline (raise, for footnote references).
+I am the style of a piece of inline text in the Roassal rendering:
 
-I am immutable: the with...: messages answer modified copies, so a style can be shared by every run that uses it.  fontKey identifies the font (family, size, bold, italic) in the font cache of the renderer (CMarkRoassalFonts).
+- the font `family` and `size`, `bold`, `italic`, `strike`, `underline`,
+- the colour and the background,
+- whether the text is code (`mono`),
+- the node that a click follows (`link`: a `CMarkLink` or a `CMarkFootnoteReference`), and
+- how far the text is raised above the baseline (`raise`, for footnote references).
+
+I am immutable: the `with...:` messages answer modified copies, so a style can be shared by every run that uses it. `fontKey` identifies the font (family, size, bold, italic) in the font cache of the renderer (`CMarkRoassalFonts`).
 "
 Class {
 	#name : 'CMarkInlineStyle',

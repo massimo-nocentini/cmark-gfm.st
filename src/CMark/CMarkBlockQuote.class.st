@@ -1,5 +1,5 @@
 "
-I am a block quote: my children are blocks.  GitHub alerts (> [!NOTE]) are plain block quotes to cmark.
+I am a block quote: my children are blocks. GitHub alerts (`> [!NOTE]`) are plain block quotes to cmark.
 "
 Class {
 	#name : 'CMarkBlockQuote',

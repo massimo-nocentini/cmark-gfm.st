@@ -1,5 +1,10 @@
 "
-I am an item of a CMarkList: my children are blocks.  markerNumber is the number of my marker as written in the source (1. 1. 1. gives 1, 1, 1; bullets give 0; only the renders of cmark renumber); markerText is the marker as written (- * + or 3.), from the source.  A task list item is a CMarkTaskItem.
+I am an item of a `CMarkList`: my children are blocks.
+
+- `markerNumber` is the number of my marker as written in the source (`1. 1. 1.` gives 1, 1, 1; bullets give 0; only the renders of cmark renumber);
+- `markerText` is the marker as written (`-` `*` `+` or `3.`), from the source.
+
+A task list item is a `CMarkTaskItem`.
 "
 Class {
 	#name : 'CMarkItem',

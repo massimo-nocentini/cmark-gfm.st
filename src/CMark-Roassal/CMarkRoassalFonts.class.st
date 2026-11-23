@@ -1,11 +1,19 @@
 "
-I am the font cache of one rendering (CMarkRoassalRenderer>>render:, which resets me at its end).
+I am the font cache of one rendering (`CMarkRoassalRenderer>>render:`, which resets me at its end).
 
-I answer the LogicalFont of a CMarkInlineStyle (fontFor:), cached by its fontKey, after checking its family against the families of the image (a missing family falls back to RSLabel familyFontName at the same size: Roassal would silently use its default font at 10 points).  The LogicalFonts themselves are made once for the image (class side, sharedFontFamily:pointSize:emphasis:) and kept, as the fonts of the user interface are.  With new LogicalFonts in every rendering, the cairo fonts of Roassal (cached per FreeTypeFont in the weak CairoBackendCache) were made and dropped again and again, and after some renderings the labels of the 11-point footnote font measured about 1.25 times too wide: the golden tests failed on the batteries image and on Pharo 12, depending on the tests run before.  With shared fonts this was not seen again.
+## Fonts
 
-I measure text per (fontKey, Character): the advance of a string is the sum of the advances of its characters.  That is exact because the cairo metrics provider of Roassal (RSCairoMetricsProvider, through RSLabel>>textExtents) sums glyph advances without kerning, and it keeps the cache small (a few hundred entries) where a cache per word would grow with every distinct word.  Each font has one probe RSLabel that does the measuring.  The ascent and the height of a font are those of its probe's textExtents (the ascent is the same for every text of a font).
+I answer the `LogicalFont` of a `CMarkInlineStyle` (`fontFor:`), cached by its `fontKey`, after checking its family against the families of the image (a missing family falls back to `RSLabel familyFontName` at the same size: Roassal would silently use its default font at 10 points).
 
-Pen positions always use these advances, never RSLabel>>width, which is ink-based.
+The `LogicalFont`s themselves are made once for the image (class side, `sharedFontFamily:pointSize:emphasis:`) and kept, as the fonts of the user interface are. With new `LogicalFont`s in every rendering, the cairo fonts of Roassal (cached per `FreeTypeFont` in the weak `CairoBackendCache`) were made and dropped again and again, and after some renderings the labels of the 11-point footnote font measured about 1.25 times too wide: the golden tests failed on the batteries image and on Pharo 12, depending on the tests run before. With shared fonts this was not seen again.
+
+## Measures
+
+I measure text per (`fontKey`, Character): the advance of a string is the sum of the advances of its characters. That is exact because the cairo metrics provider of Roassal (`RSCairoMetricsProvider`, through `RSLabel>>textExtents`) sums glyph advances without kerning, and it keeps the cache small (a few hundred entries) where a cache per word would grow with every distinct word.
+
+Each font has one probe `RSLabel` that does the measuring. The ascent and the height of a font are those of its probe's `textExtents` (the ascent is the same for every text of a font).
+
+Pen positions always use these advances, never `RSLabel>>width`, which is ink-based.
 "
 Class {
 	#name : 'CMarkRoassalFonts',

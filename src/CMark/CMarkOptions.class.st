@@ -1,9 +1,23 @@
 "
-I say how to parse and render Markdown: the extensions (a Set of the names of allExtensionNames), the options of cmark as booleans, the wrap width of the text renders, and the limits (maxDepth, cBudget, maxInputSize; docs/CMark.md, Memory and limits).  optionBits and extensionBits are the exact bits that the primitives take.
+I say how to parse and render Markdown:
 
-I am a mutable builder: the setters answer me, so they cascade (CMarkOptions gfm smart: true; footnotes: true).  commonMark and gfm answer a fresh instance every time; copy one before changing it for another use.  = and hash compare every setting: do not change an instance that is a key of a Dictionary.
+- the extensions (a Set of the names of `allExtensionNames`),
+- the options of cmark as booleans,
+- the wrap width of the text renders, and
+- the limits (`maxDepth`, `cBudget`, `maxInputSize`; `docs/CMark.md`, Memory and limits).
 
-Defaults of new: no extension, every boolean false, width 0 (no wrapping), maxDepth 1000 (nil: no limit), cBudget nil (the default of the plugin), maxInputSize defaultMaxInputSize (nil: only the cap of the plugin).
+`optionBits` and `extensionBits` are the exact bits that the primitives take.
+
+I am a mutable builder: the setters answer me, so they cascade (`CMarkOptions gfm smart: true; footnotes: true`). `commonMark` and `gfm` answer a fresh instance every time; copy one before changing it for another use. `=` and `hash` compare every setting: do not change an instance that is a key of a Dictionary.
+
+Defaults of `new`:
+
+- no extension,
+- every boolean false,
+- `width` 0 (no wrapping),
+- `maxDepth` 1000 (nil: no limit),
+- `cBudget` nil (the default of the plugin),
+- `maxInputSize` `defaultMaxInputSize` (nil: only the cap of the plugin).
 "
 Class {
 	#name : 'CMarkOptions',

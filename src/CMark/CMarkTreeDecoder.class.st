@@ -1,9 +1,19 @@
 "
-I turn the answer of primitiveParse into a tree of CMarkNodes, in pure Smalltalk and without recursion (docs/CMark.md, Tree format).  The answer is { status. code. tape. strings. nodeCount. depth. recordWords. sourceChars. sanitised }: the tape is a Bitmap of 16 words per node in pre-order (code, parent, flags, the positions of cmark, the character indices in the source, three integers and two strings per type), and strings a ByteArray of every string of the tree in UTF-8.
+I turn the answer of `primitiveParse` into a tree of `CMarkNode`s, in pure Smalltalk and without recursion (`docs/CMark.md`, Tree format). The answer is `{ status. code. tape. strings. nodeCount. depth. recordWords. sourceChars. sanitised }`:
 
-	CMarkTreeDecoder new decode: anAnswer source: aSource options: aCMarkOptions
+- the `tape` is a Bitmap of 16 words per node in pre-order (code, parent, flags, the positions of cmark, the character indices in the source, three integers and two strings per type), and
+- `strings` a ByteArray of every string of the tree in UTF-8.
 
-Pass 1 checks the parents (each one comes before its child; record 1 is the document) and counts the children; pass 2 makes each node, by the class that owns its code (classForCode:, then cmarkClassForFlags: for the task items and the header rows), reads its fields (cmarkRead:record:) and puts it in its parent.  The footnote references are then linked to their definitions.  Any broken invariant signals CMarkMalformedTree.  The tests build tapes by hand, so I need no plugin.
+```smalltalk
+CMarkTreeDecoder new
+	decode: anAnswer
+	source: aSource
+	options: aCMarkOptions
+```
+
+Pass 1 checks the parents (each one comes before its child; record 1 is the document) and counts the children; pass 2 makes each node, by the class that owns its code (`classForCode:`, then `cmarkClassForFlags:` for the task items and the header rows), reads its fields (`cmarkRead:record:`) and puts it in its parent. The footnote references are then linked to their definitions.
+
+Any broken invariant signals `CMarkMalformedTree`. The tests build tapes by hand, so I need no plugin.
 "
 Class {
 	#name : 'CMarkTreeDecoder',

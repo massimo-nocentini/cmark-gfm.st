@@ -1,13 +1,31 @@
 "
-I am the abstract node of a parse tree of cmark-gfm.  My subclasses are one class per node type (CMarkHeading, CMarkParagraph, CMarkLink...), under CMarkBlockNode and CMarkInlineNode; the task items (CMarkTaskItem) and the header rows (CMarkTableHeaderRow) are classes of their own too.
+I am the abstract node of a parse tree of cmark-gfm. My subclasses are one class per node type (`CMarkHeading`, `CMarkParagraph`, `CMarkLink`...), under `CMarkBlockNode` and `CMarkInlineNode`; the task items (`CMarkTaskItem`) and the header rows (`CMarkTableHeaderRow`) are classes of their own too.
 
-I hold my parent, my children (an Array; leaves share an empty literal), the flags of the tape, the position of cmark (startLine, startByteColumn, endLine, endByteColumn: the columns count bytes of the UTF-8 line, as cmark does) and the 1-based character indices in the source of my first and last characters (startIndex, endIndex; sourceInterval, sourceText).  A node without a position (a soft or line break, a cell that cmark padded, a hand-built node) has 0 everywhere and hasSourcePosition false.
+I hold
 
-Navigation: parent, children, document, firstChild, lastChild, nextSibling, previousSibling, indexInParent, ancestors (nearest first), depth (the document has 1).  The walks do:, allNodes, select:, detect:ifNone:, plainText and treeString are iterative, with an explicit stack, so a tree of any depth walks in constant stack; the visitor (acceptCMarkVisitor:, CMarkVisitor) recurses and is for bounded trees.
+- my `parent`,
+- my `children` (an Array; leaves share an empty literal),
+- the flags of the tape,
+- the position of cmark (`startLine`, `startByteColumn`, `endLine`, `endByteColumn`: the columns count bytes of the UTF-8 line, as cmark does), and
+- the 1-based character indices in the source of my first and last characters (`startIndex`, `endIndex`; `sourceInterval`, `sourceText`).
 
-Building by hand: new answers a node with no children, addChild: sets the parent and answers the child, withAll: and with: take a collection of children, and the subclasses have constructors (CMarkText literal:, CMarkHeading level:with:, CMarkList ordered:, CMarkTable alignments:...).
+A node without a position (a soft or line break, a cell that cmark padded, a hand-built node) has 0 everywhere and `hasSourcePosition` false.
 
-Decoding (CMarkTreeDecoder): typeCode is defined only by the class that owns a code of the tape (a subclass inherits it, but the decoder maps the code to the owner), cmarkClassForFlags: picks the flag variant, and cmarkRead:record: reads the fields of the type.
+## Navigation
+
+`parent`, `children`, `document`, `firstChild`, `lastChild`, `nextSibling`, `previousSibling`, `indexInParent`, `ancestors` (nearest first), `depth` (the document has 1).
+
+The walks `do:`, `allNodes`, `select:`, `detect:ifNone:`, `plainText` and `treeString` are iterative, with an explicit stack, so a tree of any depth walks in constant stack; the visitor (`acceptCMarkVisitor:`, `CMarkVisitor`) recurses and is for bounded trees.
+
+## Building by hand
+
+`new` answers a node with no children, `addChild:` sets the parent and answers the child, `withAll:` and `with:` take a collection of children, and the subclasses have constructors (`CMarkText literal:`, `CMarkHeading level:with:`, `CMarkList ordered:`, `CMarkTable alignments:`...).
+
+## Decoding (`CMarkTreeDecoder`)
+
+- `typeCode` is defined only by the class that owns a code of the tape (a subclass inherits it, but the decoder maps the code to the owner),
+- `cmarkClassForFlags:` picks the flag variant, and
+- `cmarkRead:record:` reads the fields of the type.
 "
 Class {
 	#name : 'CMarkNode',

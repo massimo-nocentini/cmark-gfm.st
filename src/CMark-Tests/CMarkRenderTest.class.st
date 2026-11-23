@@ -1,5 +1,5 @@
 "
-I test rendering through the CMarkPlugin (each test calls requirePlugin): the six formats of a small document against literal expectations, the tag filter, unsafe, the wrap width, the positions, the breaks, non-ASCII output, ByteArray sources and answers, and the unknown formats.
+I test rendering through the `CMarkPlugin` (each test calls `requirePlugin`): the six formats of a small document against literal expectations, the tag filter, `unsafe`, the wrap width, the positions, the breaks, non-ASCII output, ByteArray sources and answers, and the unknown formats.
 "
 Class {
 	#name : 'CMarkRenderTest',

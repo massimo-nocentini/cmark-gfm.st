@@ -1,5 +1,5 @@
 "
-I measure a parse and the decoding of its tape (with requirePlugin): 10 MB of fixture text (512 KB on WebAssembly), with the times, the node count and the bytes of object memory per node on the Transcript.  My only assertion is the time limit of 60 s.
+I measure a parse and the decoding of its tape (with `requirePlugin`): 10 MB of fixture text (512 KB on WebAssembly), with the times, the node count and the bytes of object memory per node on the Transcript. My only assertion is the time limit of 60 s.
 "
 Class {
 	#name : 'CMarkPerformanceTest',

@@ -1,7 +1,9 @@
 "
-I am a block of raw HTML: literal is the HTML as written, line terminators included.  The kind of HTML block (cmark's 7 kinds) is private to cmark and not in the tape.  Nothing interprets or runs it.
+I am a block of raw HTML: `literal` is the HTML as written, line terminators included. The kind of HTML block (cmark's 7 kinds) is private to cmark and not in the tape. Nothing interprets or runs it.
 
-	CMarkHtmlBlock literal: 'x'
+```smalltalk
+CMarkHtmlBlock literal: 'x'
+```
 "
 Class {
 	#name : 'CMarkHtmlBlock',

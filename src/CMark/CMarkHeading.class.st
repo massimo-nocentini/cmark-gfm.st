@@ -1,7 +1,9 @@
 "
-I am a heading of level 1 to 6: my children are inlines.  Whether I was written as an ATX heading (# x) or a setext one (x underlined) is private to cmark and not in the tape.  anchor is my anchor as GitHub makes it (slug, then -1, -2... for the repeats in my document).
+I am a heading of level 1 to 6: my children are inlines. Whether I was written as an ATX heading (`# x`) or a setext one (`x` underlined) is private to cmark and not in the tape. `anchor` is my anchor as GitHub makes it (slug, then -1, -2... for the repeats in my document).
 
-	CMarkHeading level: 2 with: { CMarkText literal: 'Usage' }
+```smalltalk
+CMarkHeading level: 2 with: { CMarkText literal: 'Usage' }
+```
 "
 Class {
 	#name : 'CMarkHeading',

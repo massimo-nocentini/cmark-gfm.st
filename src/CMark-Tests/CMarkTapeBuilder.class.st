@@ -1,14 +1,19 @@
 "
-I build an answer of primitiveParse by hand, for the tests that need no plugin: records of 16 words in a Bitmap and their strings in UTF-8 (docs/CMark.md, Tree format).
+I build an answer of `primitiveParse` by hand, for the tests that need no plugin: records of 16 words in a Bitmap and their strings in UTF-8 (`docs/CMark.md`, Tree format).
 
-	b := CMarkTapeBuilder new source: '# Hi'.
-	h := b add: 16r8009 parent: 1.
-	b at: h int1: 1; at: h line: 1 column: 1 toLine: 1 column: 4; at: h from: 1 to: 4.
-	t := b add: 16rC001 parent: h.
-	b at: t str1: 'Hi'.
-	b decode
+```smalltalk
+b := CMarkTapeBuilder new source: '# Hi'.
+h := b add: 16r8009 parent: 1.
+b
+	at: h int1: 1;
+	at: h line: 1 column: 1 toLine: 1 column: 4;
+	at: h from: 1 to: 4.
+t := b add: 16rC001 parent: h.
+b at: t str1: 'Hi'.
+b decode
+```
 
-Record 1, the document, exists from the start.  The ASCII flags of the strings and HAS_POS are set as the plugin sets them; the other flags with at:flags:.  answer is the 9-slot Array; a test may break it before decoding it.
+Record 1, the document, exists from the start. The ASCII flags of the strings and `HAS_POS` are set as the plugin sets them; the other flags with `at:flags:`. `answer` is the 9-slot Array; a test may break it before decoding it.
 "
 Class {
 	#name : 'CMarkTapeBuilder',

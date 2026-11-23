@@ -1,5 +1,5 @@
 "
-I am a cluster of CMarkInlineFlow: the pieces between two break opportunities, which always stay on one line together (so [link](u). and **bold**, and foo*bar*baz are each one cluster), with the opportunity before me: the line breaks before me (breaksBefore) and the blank before me (spaceText and spaceWidth: one collapsed space, or nothing between the segments of a code span).
+I am a cluster of `CMarkInlineFlow`: the pieces between two break opportunities, which always stay on one line together (so `[link](u).` and `**bold**,` and `foo*bar*baz` are each one cluster), with the opportunity before me: the line breaks before me (`breaksBefore`) and the blank before me (`spaceText` and `spaceWidth`: one collapsed space, or nothing between the segments of a code span).
 "
 Class {
 	#name : 'CMarkInlineCluster',

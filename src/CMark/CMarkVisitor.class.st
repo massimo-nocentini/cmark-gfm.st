@@ -1,7 +1,7 @@
 "
-I visit a tree of CMarkNodes by double dispatch: visit: aNode sends aNode acceptCMarkVisitor: me, which sends me the visit method of its class (visitHeading:, visitLink:...).  Each visit method defaults to visitNode:, which visits the children in order (visitChildren:) and answers the node; visitTaskItem: defaults to visitItem: and visitTableHeaderRow: to visitTableRow:.  Subclasses override the methods of the nodes they care about.
+I visit a tree of `CMarkNode`s by double dispatch: `visit: aNode` sends `aNode acceptCMarkVisitor: me`, which sends me the visit method of its class (`visitHeading:`, `visitLink:`...). Each visit method defaults to `visitNode:`, which visits the children in order (`visitChildren:`) and answers the node; `visitTaskItem:` defaults to `visitItem:` and `visitTableHeaderRow:` to `visitTableRow:`. Subclasses override the methods of the nodes they care about.
 
-Visiting recurses, once per level of the tree, so it is for bounded trees (CMarkOptions maxDepth bounds the parsed ones); the walks of the library (CMarkNode>>do:, plainText, treeString, CMarkTreeDecoder) are iterative.
+Visiting recurses, once per level of the tree, so it is for bounded trees (`CMarkOptions maxDepth` bounds the parsed ones); the walks of the library (`CMarkNode>>do:`, `plainText`, `treeString`, `CMarkTreeDecoder`) are iterative.
 "
 Class {
 	#name : 'CMarkVisitor',

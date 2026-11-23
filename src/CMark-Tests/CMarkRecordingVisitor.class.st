@@ -1,5 +1,5 @@
 "
-I am a visitor that records the nodes that reach visitNode:, in order, and the items and rows that reach visitItem: and visitTableRow:.
+I am a visitor that records the nodes that reach `visitNode:`, in order, and the items and rows that reach `visitItem:` and `visitTableRow:`.
 "
 Class {
 	#name : 'CMarkRecordingVisitor',

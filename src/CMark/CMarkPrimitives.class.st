@@ -1,9 +1,31 @@
 "
-I am the binding of the CMarkPlugin of the VM, on my class side only (docs/CMark.md of massimo-nocentini/pharo-vm, section Primitive contract, is the contract).  The four primitives are primInfo, primParse:..., primRender:... and primRelease; without the plugin they answer nil, a CMarkFailure and 0.  The plugin is used only when it speaks my protocol (pluginInfo, asked once per session).
+I am the binding of the `CMarkPlugin` of the VM, on my class side only (`docs/CMark.md` of `massimo-nocentini/pharo-vm`, section Primitive contract, is the contract).
 
-parse:options:extensions:maxDepth:cBudget: and render:format:options:extensions:width:cBudget: run the budget loop: where budgetChecked (on WebAssembly, or when old space has a maximum), a source of more than 65,536 units gets the free old space as its budget, and an answer that would not fit is refused with its exact need (status 1); then the object memory is grown and the call made again, which the plugin answers from the result it kept, without parsing again.  A primitive that fails because an allocation of its answer failed is recovered the same way (measured with budget 0, memory grown, called with no budget).  An exception inside the loop releases the kept result (primRelease) at once.  The answers keep their statuses: signalStatusOf:maxDepth:cBudget: turns a status 2, 3 or 4 into CMarkInputTooLarge, CMarkTooDeep or CMarkMemoryLimit; CMarkParser and CMarkFormatter call it.  Without the plugin, the loop signals CMarkUnavailable before anything else.
+The four primitives are `primInfo`, `primParse:...`, `primRender:...` and `primRelease`; without the plugin they answer nil, a `CMarkFailure` and 0. The plugin is used only when it speaks my protocol (`pluginInfo`, asked once per session).
 
-Test hooks (testHook:value:, nil removes one, clearTestHooks removes all; each forgets pluginInfo): #pluginMissing (true: behave as if the module were absent), #protocol (an Integer: pretend the plugin answered this protocol), #budget (the budget of the first call of every loop), #cBudget (the cBudget of every call), #grow (a block of the byte count, evaluated instead of growing the object memory).
+## The budget loop
+
+`parse:options:extensions:maxDepth:cBudget:` and `render:format:options:extensions:width:cBudget:` run the budget loop: where `budgetChecked` (on WebAssembly, or when old space has a maximum), a source of more than 65,536 units gets the free old space as its budget, and an answer that would not fit is refused with its exact need (status 1); then the object memory is grown and the call made again, which the plugin answers from the result it kept, without parsing again.
+
+A primitive that fails because an allocation of its answer failed is recovered the same way (measured with budget 0, memory grown, called with no budget).
+
+An exception inside the loop releases the kept result (`primRelease`) at once.
+
+The answers keep their statuses: `signalStatusOf:maxDepth:cBudget:` turns a status 2, 3 or 4 into `CMarkInputTooLarge`, `CMarkTooDeep` or `CMarkMemoryLimit`; `CMarkParser` and `CMarkFormatter` call it.
+
+Without the plugin, the loop signals `CMarkUnavailable` before anything else.
+
+## Test hooks
+
+`testHook:value:`, nil removes one, `clearTestHooks` removes all; each forgets `pluginInfo`:
+
+| Hook | Value |
+|:-----|:------|
+| `#pluginMissing` | true: behave as if the module were absent |
+| `#protocol` | an Integer: pretend the plugin answered this protocol |
+| `#budget` | the budget of the first call of every loop |
+| `#cBudget` | the `cBudget` of every call |
+| `#grow` | a block of the byte count, evaluated instead of growing the object memory |
 "
 Class {
 	#name : 'CMarkPrimitives',

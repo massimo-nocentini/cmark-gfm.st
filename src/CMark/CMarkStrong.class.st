@@ -1,5 +1,5 @@
 "
-I am strong emphasis (**x** or __x__): my children are inlines.
+I am strong emphasis (`**x**` or `__x__`): my children are inlines.
 "
 Class {
 	#name : 'CMarkStrong',

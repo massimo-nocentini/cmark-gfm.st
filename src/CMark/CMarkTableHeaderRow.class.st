@@ -1,5 +1,5 @@
 "
-I am the header row of a CMarkTable.  The tape codes me as a row with the HEADER flag, so I answer no typeCode of my own.
+I am the header row of a `CMarkTable`. The tape codes me as a row with the `HEADER` flag, so I answer no `typeCode` of my own.
 "
 Class {
 	#name : 'CMarkTableHeaderRow',

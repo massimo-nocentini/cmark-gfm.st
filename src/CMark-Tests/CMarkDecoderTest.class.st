@@ -1,5 +1,5 @@
 "
-I test CMarkTreeDecoder on tapes built by hand (CMarkTapeBuilder): every code of the tape, every flag and every field, the flag variants, unknown codes, ASCII and non-ASCII strings, the sanitised bytes, the footnote links, malformed tapes, and a chain of 200,000 nodes.  No plugin is needed.
+I test `CMarkTreeDecoder` on tapes built by hand (`CMarkTapeBuilder`): every code of the tape, every flag and every field, the flag variants, unknown codes, ASCII and non-ASCII strings, the sanitised bytes, the footnote links, malformed tapes, and a chain of 200,000 nodes. No plugin is needed.
 "
 Class {
 	#name : 'CMarkDecoderTest',

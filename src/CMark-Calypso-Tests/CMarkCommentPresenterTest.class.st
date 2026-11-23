@@ -1,5 +1,14 @@
 "
-I test CMarkCommentPresenter: the canvas of a class comment (the CMark shape, the camera of canvasFor:, long lines that wrap, Smalltalk code that keeps its text), the theme (dark or light UI theme, set or followed, a change of the UI theme), the notes of an empty comment, of a VM without the plugin and of a comment cmark refuses, drawing again when the comment or the class changes, the drawing in the Morphic UI process only when another process asks for it (once for all that wait) and at once when the presenter is not built, the window title, the keyboard focus, and the weak subscription to the changes of comments, which ends when the window closes.
+I test `CMarkCommentPresenter`:
+
+- the canvas of a class comment (the CMark shape, the camera of `canvasFor:`, long lines that wrap, Smalltalk code that keeps its text);
+- the theme (dark or light UI theme, set or followed, a change of the UI theme);
+- the notes of an empty comment, of a VM without the plugin and of a comment cmark refuses;
+- drawing again when the comment or the class changes;
+- the drawing in the Morphic UI process only when another process asks for it (once for all that wait) and at once when the presenter is not built;
+- the window title;
+- the keyboard focus; and
+- the weak subscription to the changes of comments, which ends when the window closes.
 "
 Class {
 	#name : 'CMarkCommentPresenterTest',

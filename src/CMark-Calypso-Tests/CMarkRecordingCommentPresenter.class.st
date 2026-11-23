@@ -1,5 +1,5 @@
 "
-I am a CMarkCommentPresenter that records the process of each of its drawings (drawingProcesses), for the tests of the drawing in the Morphic UI process (CMarkCommentPresenterTest).
+I am a `CMarkCommentPresenter` that records the process of each of its drawings (`drawingProcesses`), for the tests of the drawing in the Morphic UI process (`CMarkCommentPresenterTest`).
 "
 Class {
 	#name : 'CMarkRecordingCommentPresenter',

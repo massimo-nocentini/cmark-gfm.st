@@ -1,5 +1,5 @@
 "
-I test the node API without the plugin: building by hand, navigation, the iterative walks, plainText, printing, treeString, the table cells, the anchors of the headings, the constructors, and the cmarkSource, cmarkFailed and cmarkUtf8Decoded extensions.
+I test the node API without the plugin: building by hand, navigation, the iterative walks, `plainText`, printing, `treeString`, the table cells, the anchors of the headings, the constructors, and the `cmarkSource`, `cmarkFailed` and `cmarkUtf8Decoded` extensions.
 "
 Class {
 	#name : 'CMarkNodeTest',

@@ -1,7 +1,9 @@
 "
-I am a run of text: literal is the text, entities and escapes resolved.
+I am a run of text: `literal` is the text, entities and escapes resolved.
 
-	CMarkText literal: 'x'
+```smalltalk
+CMarkText literal: 'x'
+```
 "
 Class {
 	#name : 'CMarkText',

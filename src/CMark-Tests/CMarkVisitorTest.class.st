@@ -1,5 +1,5 @@
 "
-I test the double dispatch of the nodes (each concrete class sends its own visit method) and the defaults of CMarkVisitor (every visit method reaches visitNode:, visitTaskItem: goes through visitItem:, visitTableHeaderRow: through visitTableRow:).
+I test the double dispatch of the nodes (each concrete class sends its own visit method) and the defaults of `CMarkVisitor` (every visit method reaches `visitNode:`, `visitTaskItem:` goes through `visitItem:`, `visitTableHeaderRow:` through `visitTableRow:`).
 "
 Class {
 	#name : 'CMarkVisitorTest',

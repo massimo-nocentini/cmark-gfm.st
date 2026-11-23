@@ -1,7 +1,13 @@
 "
-I am a run of inline content, as CMarkInlineRunCollector makes it from the inline nodes of a block and CMarkInlineFlow lays it out: a kind, a string, a style (CMarkInlineStyle) and the node that produced me (the model of my shapes).
+I am a run of inline content, as `CMarkInlineRunCollector` makes it from the inline nodes of a block and `CMarkInlineFlow` lays it out: a kind, a string, a style (`CMarkInlineStyle`) and the node that produced me (the model of my shapes).
 
-Kinds: #text (text, split at blanks by the flow), #space (a soft break: one blank), #break (a line break), #code (a code span, split at its spaces into chips), #atom (an image or its placeholder: shape and ascent, the part of the shape above the baseline).
+Kinds:
+
+- `#text` (text, split at blanks by the flow),
+- `#space` (a soft break: one blank),
+- `#break` (a line break),
+- `#code` (a code span, split at its spaces into chips),
+- `#atom` (an image or its placeholder: `shape` and `ascent`, the part of the shape above the baseline).
 "
 Class {
 	#name : 'CMarkInlineRun',

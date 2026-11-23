@@ -1,7 +1,9 @@
 "
-I am an image: my children are its description (inlines; altText is their plain text), url its source, title its title ('' when absent).
+I am an image: my children are its description (inlines; `altText` is their plain text), `url` its source, `title` its title (`''` when absent).
 
-	CMarkImage url: 'logo.png' title: ''
+```smalltalk
+CMarkImage url: 'logo.png' title: ''
+```
 "
 Class {
 	#name : 'CMarkImage',

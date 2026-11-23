@@ -1,7 +1,9 @@
 "
 I am a paragraph: my children are inlines.
 
-	CMarkParagraph with: { CMarkText literal: 'Hello' }
+```smalltalk
+CMarkParagraph with: { CMarkText literal: 'Hello' }
+```
 "
 Class {
 	#name : 'CMarkParagraph',

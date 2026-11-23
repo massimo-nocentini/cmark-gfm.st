@@ -1,5 +1,5 @@
 "
-I am a body row of a CMarkTable: my children are CMarkTableCells.  The header row is a CMarkTableHeaderRow.
+I am a body row of a `CMarkTable`: my children are `CMarkTableCell`s. The header row is a `CMarkTableHeaderRow`.
 "
 Class {
 	#name : 'CMarkTableRow',

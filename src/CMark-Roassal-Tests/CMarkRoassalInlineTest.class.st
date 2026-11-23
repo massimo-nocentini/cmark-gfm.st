@@ -1,5 +1,5 @@
 "
-I test the inline layout (CMarkInlineFlow): baselines of mixed sizes, clusters at the wrap boundary, code spans that wrap at their spaces, U+00A0, hard breaks from the options of the document, narrowing, deep emphasis, raised footnote references, and the no-kerning guard the breaker relies on.
+I test the inline layout (`CMarkInlineFlow`): baselines of mixed sizes, clusters at the wrap boundary, code spans that wrap at their spaces, U+00A0, hard breaks from the options of the document, narrowing, deep emphasis, raised footnote references, and the no-kerning guard the breaker relies on.
 "
 Class {
 	#name : 'CMarkRoassalInlineTest',

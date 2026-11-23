@@ -1,5 +1,5 @@
 "
-I am a custom inline of cmark (made by programs, never by the parser): onEnter and onExit are the literal texts the renders put around my children.
+I am a custom inline of cmark (made by programs, never by the parser): `onEnter` and `onExit` are the literal texts the renders put around my children.
 "
 Class {
 	#name : 'CMarkCustomInline',

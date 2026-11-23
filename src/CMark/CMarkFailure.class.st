@@ -1,5 +1,7 @@
 "
-I am the error code of a failed primitive of the CMarkPlugin (ec: a Symbol such as #'bad argument' or #'insufficient object memory', or nil when the module is missing).  A primitive fails only on a bug of the caller or when an object allocation fails; limits are statuses of the answer, not failures (docs/CMark.md, Primitive contract).  A missing extension of the plugin (PrimErrNotFound) also reads #'not found': pluginInfo tells it apart from a missing module.
+I am the error code of a failed primitive of the `CMarkPlugin` (`ec`: a Symbol such as `#'bad argument'` or `#'insufficient object memory'`, or nil when the module is missing).
+
+A primitive fails only on a bug of the caller or when an object allocation fails; limits are statuses of the answer, not failures (`docs/CMark.md`, Primitive contract). A missing extension of the plugin (`PrimErrNotFound`) also reads `#'not found'`: `pluginInfo` tells it apart from a missing module.
 "
 Class {
 	#name : 'CMarkFailure',

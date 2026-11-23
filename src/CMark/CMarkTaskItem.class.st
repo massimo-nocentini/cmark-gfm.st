@@ -1,7 +1,9 @@
 "
-I am a task list item of the tasklist extension (- [ ] open, - [x] done): checked says whether my box is ticked.  The tape codes me as an item with the TASK flag, so I answer no typeCode of my own.
+I am a task list item of the tasklist extension (`- [ ]` open, `- [x]` done): `checked` says whether my box is ticked. The tape codes me as an item with the `TASK` flag, so I answer no `typeCode` of my own.
 
-	CMarkTaskItem checked: true
+```smalltalk
+CMarkTaskItem checked: true
+```
 "
 Class {
 	#name : 'CMarkTaskItem',

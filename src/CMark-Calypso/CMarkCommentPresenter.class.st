@@ -1,11 +1,24 @@
 "
-I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, without footnotes: see options) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once a click gave the canvas the focus).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one, both wrapping long code lines and long words so that the page keeps the width of the theme) unless markdownTheme: sets one; once built, I draw again when the UI theme changes (uiThemeChanged).
+I show the comment of a class as Markdown: cmark-gfm parses it (`CMarkOptions gfm`, without footnotes: see `options`) and `CMarkRoassalRenderer` draws it in the canvas of an `SpRoassalPresenter`.
 
-	(CMarkCommentPresenter on: CMarkRoassalRenderer) open.
+- As with `CMarkRoassalRenderer>>canvasFor:`, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once a click gave the canvas the focus).
+- The theme follows the UI theme of Pharo (`CMarkRoassalTheme dark` on a dark UI theme, `default` on a light one, both wrapping long code lines and long words so that the page keeps the width of the theme) unless `markdownTheme:` sets one; once built, I draw again when the UI theme changes (`uiThemeChanged`).
 
-I am the content of the Markdown tab of the Calypso browser (CMarkClassCommentToolMorph), and work alone too.
+```smalltalk
+(CMarkCommentPresenter on: CMarkRoassalRenderer) open.
+```
 
-I draw again when the comment of my class changes (ClassCommented, from the SystemAnnouncer, to which I subscribe weakly when I am made) and when targetClass: gives me another class.  I draw in the Morphic UI process only (refresh): a change announced by another process (a load in the background, a theme set by a script) is drawn by the UI process at its next cycle, and the changes that wait for it are drawn once.  I unsubscribe when my window closes (windowIsClosing) or when told to (unsubscribe: the Calypso tab does it when it is removed, and when its browser closes).  I never fail on a comment: an empty comment, a VM without the CMarkPlugin and a comment that cmark refuses each show a short muted note instead.
+I am the content of the Markdown tab of the Calypso browser (`CMarkClassCommentToolMorph`), and work alone too.
+
+## Drawing again
+
+I draw again when the comment of my class changes (`ClassCommented`, from the `SystemAnnouncer`, to which I subscribe weakly when I am made) and when `targetClass:` gives me another class.
+
+I draw in the Morphic UI process only (`refresh`): a change announced by another process (a load in the background, a theme set by a script) is drawn by the UI process at its next cycle, and the changes that wait for it are drawn once.
+
+I unsubscribe when my window closes (`windowIsClosing`) or when told to (`unsubscribe`: the Calypso tab does it when it is removed, and when its browser closes).
+
+I never fail on a comment: an empty comment, a VM without the `CMarkPlugin` and a comment that cmark refuses each show a short muted note instead.
 "
 Class {
 	#name : 'CMarkCommentPresenter',

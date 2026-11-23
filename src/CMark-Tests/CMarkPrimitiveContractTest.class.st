@@ -1,5 +1,5 @@
 "
-I test the contract of the primitives of the CMarkPlugin as CMarkPrimitives sees it (each test calls requirePlugin): primitiveInfo, the conversions of the sources, the bad arguments (a CMarkFailure with #'bad argument'), the need of a refused answer against the formula of the plugin, and primitiveRelease.
+I test the contract of the primitives of the `CMarkPlugin` as `CMarkPrimitives` sees it (each test calls `requirePlugin`): `primitiveInfo`, the conversions of the sources, the bad arguments (a `CMarkFailure` with `#'bad argument'`), the need of a refused answer against the formula of the plugin, and `primitiveRelease`.
 "
 Class {
 	#name : 'CMarkPrimitiveContractTest',

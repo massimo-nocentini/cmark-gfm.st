@@ -1,11 +1,13 @@
 "
-I am the small tokenizer of raw HTML for the #basic htmlStyle of the Roassal rendering: a few rules over the literal, no DOM, no entities beyond those that cmark already decoded, and nothing is ever executed.
+I am the small tokenizer of raw HTML for the `#basic` `htmlStyle` of the Roassal rendering: a few rules over the literal, no DOM, no entities beyond those that cmark already decoded, and nothing is ever executed.
 
-tokensOf: answers an Array of tokens, each an Array whose first element is the selector that handles it in CMarkInlineRunCollector:
-- { #htmlText:node:. aString }: the text between tags;
-- { #htmlBreak:node: }: <br>, and the start or end tag of a block element (p, div, h1-h6, li, tr, pre, details, summary...);
-- { #htmlImage:node:. src. alt }: <img> with its src and alt attributes ('' when absent).
-Comments (<!-- -->), declarations, processing instructions and every other tag vanish.  A < that does not open a tag is text.
+`tokensOf:` answers an Array of tokens, each an Array whose first element is the selector that handles it in `CMarkInlineRunCollector`:
+
+- `{ #htmlText:node:. aString }`: the text between tags;
+- `{ #htmlBreak:node: }`: `<br>`, and the start or end tag of a block element (`p`, `div`, `h1`-`h6`, `li`, `tr`, `pre`, `details`, `summary`...);
+- `{ #htmlImage:node:. src. alt }`: `<img>` with its `src` and `alt` attributes (`''` when absent).
+
+Comments (`<!-- -->`), declarations, processing instructions and every other tag vanish. A `<` that does not open a tag is text.
 "
 Class {
 	#name : 'CMarkHtmlLite',

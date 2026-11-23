@@ -1,5 +1,5 @@
 "
-I am a thematic break (***, ---, ___): I have no children.
+I am a thematic break (`***`, `---`, `___`): I have no children.
 "
 Class {
 	#name : 'CMarkThematicBreak',

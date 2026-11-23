@@ -1,5 +1,11 @@
 "
-I am signalled when the C memory of a parse or a render went over a limit of the plugin (status 4): reason is #budget (the C budget of the call, cBudget of the CMarkOptions or the default of the plugin), #block (one allocation of cmark over 256 MiB, which a line or a paragraph of about 170 MiB reaches) or #malloc (the C heap had no memory).  The plugin freed everything before answering.
+I am signalled when the C memory of a parse or a render went over a limit of the plugin (status 4): `reason` is
+
+- `#budget` (the C budget of the call, `cBudget` of the `CMarkOptions` or the default of the plugin),
+- `#block` (one allocation of cmark over 256 MiB, which a line or a paragraph of about 170 MiB reaches), or
+- `#malloc` (the C heap had no memory).
+
+The plugin freed everything before answering.
 "
 Class {
 	#name : 'CMarkMemoryLimit',

@@ -1,5 +1,11 @@
 "
-I am what the renderer answers for a block node: its shape (an RSComposite whose top-left is its local 0@0 and whose first child is a transparent frame box), the y of its first baseline (for list markers and table rows), its natural width (the widest line it would make at an unlimited width, for tables), its minimum width (its widest unbreakable cluster, for tables), and its height.
+I am what the renderer answers for a block node:
+
+- its shape (an `RSComposite` whose top-left is its local `0@0` and whose first child is a transparent frame box),
+- the y of its first baseline (for list markers and table rows),
+- its natural width (the widest line it would make at an unlimited width, for tables),
+- its minimum width (its widest unbreakable cluster, for tables), and
+- its height.
 "
 Class {
 	#name : 'CMarkRoassalBlock',

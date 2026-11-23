@@ -1,11 +1,23 @@
 "
-I render Markdown source text to text through the renderers of cmark-gfm in the CMarkPlugin: #html, #xml, #commonmark, #plaintext, #latex or #man (my format, #html by default), with my options (CMarkOptions gfm by default; width is the wrap width of the text formats, sourcePos puts the positions into the HTML and the XML, unsafe keeps raw HTML).
+I render Markdown source text to text through the renderers of cmark-gfm in the `CMarkPlugin`: `#html`, `#xml`, `#commonmark`, `#plaintext`, `#latex` or `#man` (my `format`, `#html` by default), with my options (`CMarkOptions gfm` by default; `width` is the wrap width of the text formats, `sourcePos` puts the positions into the HTML and the XML, `unsafe` keeps raw HTML).
 
-	CMarkFormatter html: '# Hi'.                                 ""'<h1>Hi</h1>', LF""
-	CMarkFormatter render: '# Hi' format: #man options: CMarkOptions commonMark.
-	CMarkFormatter renderBytes: aByteArray format: #html options: CMarkOptions gfm.    ""UTF-8 bytes""
+```smalltalk
+CMarkFormatter html: '# Hi'.
+	""'<h1>Hi</h1>', LF""
+CMarkFormatter
+	render: '# Hi'
+	format: #man
+	options: CMarkOptions commonMark.
+CMarkFormatter
+	renderBytes: aByteArray
+	format: #html
+	options: CMarkOptions gfm.
+	""UTF-8 bytes""
+```
 
-I render source text, not trees (CMarkRoassalRenderer draws trees): there is no Smalltalk CommonMark writer, so a tree built or changed by hand cannot reach these renderers.  An unknown format is a CMarkError before any call; the sources, the size check and the errors are those of CMarkParser.
+I render source text, not trees (`CMarkRoassalRenderer` draws trees): there is no Smalltalk CommonMark writer, so a tree built or changed by hand cannot reach these renderers.
+
+An unknown format is a `CMarkError` before any call; the sources, the size check and the errors are those of `CMarkParser`.
 "
 Class {
 	#name : 'CMarkFormatter',

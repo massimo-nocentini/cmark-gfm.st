@@ -1,10 +1,16 @@
 "
-I parse Markdown into a CMarkDocument through the CMarkPlugin, with my options (a CMarkOptions, CMarkOptions gfm by default).
+I parse Markdown into a `CMarkDocument` through the `CMarkPlugin`, with my options (a `CMarkOptions`, `CMarkOptions gfm` by default).
 
-	CMarkParser parse: '# Hi'.
-	(CMarkParser new options: (CMarkOptions gfm footnotes: true; yourself); yourself) parse: aString.
+```smalltalk
+CMarkParser parse: '# Hi'.
+(CMarkParser new
+	options: (CMarkOptions gfm footnotes: true; yourself);
+	yourself) parse: aString.
+```
 
-parse: takes a ByteString (Latin-1), a WideString or a ByteArray of UTF-8; any other String (a Symbol) and a Text are converted (cmarkSource), anything else is a CMarkError.  A source larger than the maxInputSize of the options signals CMarkInputTooLarge before any call.  Then the plugin parses (the budget loop of CMarkPrimitives), and CMarkTreeDecoder makes the tree.  The statuses of the plugin signal CMarkInputTooLarge, CMarkTooDeep and CMarkMemoryLimit; without the plugin, CMarkUnavailable.  The document keeps a copy of the options.
+`parse:` takes a ByteString (Latin-1), a WideString or a ByteArray of UTF-8; any other String (a Symbol) and a Text are converted (`cmarkSource`), anything else is a `CMarkError`. A source larger than the `maxInputSize` of the options signals `CMarkInputTooLarge` before any call.
+
+Then the plugin parses (the budget loop of `CMarkPrimitives`), and `CMarkTreeDecoder` makes the tree. The statuses of the plugin signal `CMarkInputTooLarge`, `CMarkTooDeep` and `CMarkMemoryLimit`; without the plugin, `CMarkUnavailable`. The document keeps a copy of the options.
 "
 Class {
 	#name : 'CMarkParser',
