@@ -215,19 +215,55 @@ Then [^self error: ''a <b>c''] and more text here.
 ]
 
 { #category : 'tests' }
+CMarkCommentPresenterTest >> testDrawsAgainWhenTheUIThemeChanges [
+	"An open presenter follows a change of the UI theme of Pharo (UITheme current:, as the Settings do), unless it has a theme of its own"
+
+	| previous following fixed windows |
+	self requireCanvas.
+	previous := Smalltalk ui theme.
+	windows := OrderedCollection new.
+	[
+	UITheme current: PharoLightTheme new.
+	following := self presenterOn: (self scratchClass: #CMarkCalypsoScratchA comment: 'text').
+	fixed := self presenterOn: (self scratchClass: #CMarkCalypsoScratchB comment: 'text').
+	fixed markdownTheme: CMarkRoassalTheme default.
+	windows add: following open; add: fixed open.
+	self assert: following canvas color equals: CMarkRoassalTheme default background.
+	UITheme current: PharoDarkTheme new.
+	self assert: following canvas color equals: CMarkRoassalTheme dark background.
+	self assert: fixed canvas color equals: CMarkRoassalTheme default background.
+	UITheme current: PharoLightTheme new.
+	self assert: following canvas color equals: CMarkRoassalTheme default background ] ensure: [
+		windows do: [ :each | each close ].
+		UITheme current: previous ]
+]
+
+{ #category : 'tests' }
+CMarkCommentPresenterTest >> testIsDarkTheme [
+	self assert: (CMarkCommentPresenter isDarkTheme: PharoDarkTheme new).
+	self deny: (CMarkCommentPresenter isDarkTheme: PharoLightTheme new).
+	self deny: (CMarkCommentPresenter isDarkTheme: nil).
+	self assert: CMarkCommentPresenter isDarkUITheme equals: (CMarkCommentPresenter isDarkTheme: Smalltalk ui theme)
+]
+
+{ #category : 'tests' }
 CMarkCommentPresenterTest >> testThemeFollowsTheUITheme [
-	| presenter expected |
+	"markdownTheme: draws again with the theme given; nil follows the UI theme"
+
+	| presenter |
 	self requireCanvas.
 	presenter := self presenterOn: (self scratchClass: #CMarkCalypsoScratchA comment: 'text').
-	expected := CMarkCommentPresenter isDarkUITheme
-		            ifTrue: [ CMarkRoassalTheme dark ]
-		            ifFalse: [ CMarkRoassalTheme default ].
-	self assert: presenter markdownTheme background equals: expected background.
-	self assert: presenter markdownTheme textColor equals: expected textColor.
+	presenter canvas.
 	presenter markdownTheme: CMarkRoassalTheme dark.
 	self assert: presenter canvas color equals: CMarkRoassalTheme dark background.
+	presenter markdownTheme: CMarkRoassalTheme default.
+	self assert: presenter canvas color equals: CMarkRoassalTheme default background.
 	presenter markdownTheme: nil.
-	self assert: presenter markdownTheme textColor equals: expected textColor
+	self
+		assert: presenter canvas color
+		equals: (CMarkCommentPresenter isDarkUITheme
+				 ifTrue: [ CMarkRoassalTheme dark background ]
+				 ifFalse: [ CMarkRoassalTheme default background ])
 ]
 
 { #category : 'tests' }

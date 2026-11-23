@@ -1,5 +1,5 @@
 "
-I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, without footnotes: see options) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once the pointer is over the canvas).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one, both wrapping long code lines and long words so that the page keeps the width of the theme) unless markdownTheme: sets one.
+I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, without footnotes: see options) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once the pointer is over the canvas).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one, both wrapping long code lines and long words so that the page keeps the width of the theme) unless markdownTheme: sets one; once built, I draw again when the UI theme changes (uiThemeChanged).
 
 	(CMarkCommentPresenter on: CMarkRoassalRenderer) open.
 
@@ -46,12 +46,19 @@ CMarkCommentPresenter class >> isBlank: aCharacter [
 ]
 
 { #category : 'theme' }
-CMarkCommentPresenter class >> isDarkUITheme [
-	"Whether the UI theme of Pharo is dark: its background is darker than mid-grey"
+CMarkCommentPresenter class >> isDarkTheme: aUITheme [
+	"Whether aUITheme is dark: its background is darker than mid-grey"
 
-	^ [ Smalltalk ui theme backgroundColor luminance < 0.5 ]
+	^ [ aUITheme backgroundColor luminance < 0.5 ]
 		  on: Error
 		  do: [ :error | false ]
+]
+
+{ #category : 'theme' }
+CMarkCommentPresenter class >> isDarkUITheme [
+	"Whether the UI theme of Pharo is dark"
+
+	^ self isDarkTheme: Smalltalk ui theme
 ]
 
 { #category : 'notes' }
@@ -125,6 +132,8 @@ CMarkCommentPresenter >> drawOn: aCanvas [
 			         yourself.
 		contents := self class noteDocument: contents ].
 	shape := (CMarkRoassalRenderer theme: theme) show: contents on: aCanvas.
+	"the morph of the canvas announces the changes of the UI theme of Pharo"
+	aCanvas when: RSThemeChangedEvent do: [ :event | self uiThemeChanged ] for: self.
 	"the keys of the canvas controller act once the canvas has the focus, as in the UML tab of Roassal"
 	aCanvas when: RSMouseEnter do: [ :event | aCanvas morph ifNotNil: [ :morph | morph takeKeyboardFocus ] ] for: self
 ]
@@ -245,6 +254,13 @@ CMarkCommentPresenter >> targetClass: aClass [
 
 	targetClass := aClass.
 	self refresh
+]
+
+{ #category : 'theme' }
+CMarkCommentPresenter >> uiThemeChanged [
+	"The UI theme of Pharo changed (the morph of my canvas got themeChanged): draw again when my theme follows it"
+
+	markdownTheme ifNil: [ self refresh ]
 ]
 
 { #category : 'announcements' }
