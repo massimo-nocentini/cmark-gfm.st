@@ -43,6 +43,13 @@ CMarkCalypsoTestCase >> markdownToolOf: aBrowser [
 ]
 
 { #category : 'helpers' }
+CMarkCalypsoTestCase >> markdownToolsOf: aBrowser [
+	"All the Markdown tabs of aBrowser (there must be one at most)"
+
+	^ (aBrowser tabManager tools select: [ :each | each class == CMarkClassCommentToolMorph ]) asArray
+]
+
+{ #category : 'helpers' }
 CMarkCalypsoTestCase >> presenterOn: aClass [
 	"A CMarkCommentPresenter on aClass, unsubscribed by tearDown"
 

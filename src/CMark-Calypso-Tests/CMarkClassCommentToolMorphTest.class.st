@@ -111,6 +111,48 @@ CMarkClassCommentToolMorphTest >> testBrowserShowsTheTabForTheClassSide [
 ]
 
 { #category : 'tests' }
+CMarkClassCommentToolMorphTest >> testIsValidInTheContextsOfItsClass [
+	"Calypso keeps a tool that is valid in the new context (ClyTargetTool>>match:) instead of making another"
+
+	| a b browser tool |
+	a := self scratchClass: #CMarkCalypsoScratchA comment: 'one'.
+	b := self scratchClass: #CMarkCalypsoScratchB comment: 'two'.
+	browser := self browserOn: a.
+	tool := self markdownToolOf: browser.
+	self assert: (tool isValidInContext: tool context).
+	browser selectClass: a class.
+	self assert: (self markdownToolOf: browser) identicalTo: tool.
+	self assert: (tool isValidInContext: (self markdownToolOf: browser) context).
+	browser selectClass: b.
+	self deny: (tool isValidInContext: (self markdownToolOf: browser) context)
+]
+
+{ #category : 'tests' }
+CMarkClassCommentToolMorphTest >> testKeepsOneTabWhenTheSystemChanges [
+	"A method compiled, in the class or in another one, a comment accepted and a method selected keep the same built Markdown tab: Calypso rebuilds its tools on every change of the system (ClyBrowserMorph>>rebuildToolsForChangedEnvironment)"
+
+	| a b browser tool |
+	self requireCanvas.
+	a := self scratchClass: #CMarkCalypsoScratchA comment: self richComment.
+	b := self scratchClass: #CMarkCalypsoScratchB.
+	browser := self browserOn: a.
+	tool := self markdownToolOf: browser.
+	self show: tool in: browser.
+	a compile: 'scratchMethod ^ 1' classified: 'scratch'.
+	browser rebuildToolsForChangedEnvironment.
+	self assert: (self markdownToolsOf: browser) equals: { tool }.
+	b compile: 'otherMethod ^ 2' classified: 'scratch'.
+	browser rebuildToolsForChangedEnvironment.
+	self assert: (self markdownToolsOf: browser) equals: { tool }.
+	a comment: '# Edited'.
+	browser rebuildToolsForChangedEnvironment.
+	self assert: (self markdownToolsOf: browser) equals: { tool }.
+	browser selectMethod: a >> #scratchMethod.
+	self assert: (self markdownToolsOf: browser) equals: { tool }.
+	self assert: tool isBuilt
+]
+
+{ #category : 'tests' }
 CMarkClassCommentToolMorphTest >> testIconAndTitle [
 	| tool |
 	tool := CMarkClassCommentToolMorph new.

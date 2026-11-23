@@ -6,6 +6,7 @@ I show the comment of the selected class as **Markdown**: cmark-gfm parses it an
 - I am activated like the *UML-Class* tab of Roassal (a class is selected), but only for a class whose comment is not empty (or only blanks).
 - My `activationPriority`, -200 like the UML-Class tab's, leaves the default selection to the definition and the comment.
 - I need nothing of Roassal-UML-Calypso, only Calypso.
+- Calypso keeps me, built, while my class stays selected (`isValidInContext:`): through the changes of the system (a method compiled, a comment accepted), the switch to the class side and the selection of a method.
 - The presenter subscribes to the changes of comments and draws the new comment; I unsubscribe it when Calypso removes me (`detachFromSystem`, sent when the tab is removed and when the browser closes).
 
 My `tabOrder` puts me right after the Comment tab:
@@ -91,6 +92,14 @@ CMarkClassCommentToolMorph >> defaultTitle [
 CMarkClassCommentToolMorph >> detachFromSystem [
 	super detachFromSystem.
 	presenter ifNotNil: [ :aPresenter | aPresenter unsubscribe ]
+]
+
+{ #category : 'testing' }
+CMarkClassCommentToolMorph >> isValidInContext: aBrowserContext [
+	"Whether Calypso can keep me for aBrowserContext instead of making a new tab: a context of the same kind on my class, on either side (the comment is the same).  Without this, every change of the system (a method compiled, a comment accepted) would add a second Markdown tab, and selecting a method would replace me by a new tab drawn again"
+
+	self context class = aBrowserContext class ifFalse: [ ^ false ].
+	^ aBrowserContext isClassSelected and: [ targetClass = aBrowserContext lastSelectedClass instanceSide ]
 ]
 
 { #category : 'testing' }
