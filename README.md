@@ -1,6 +1,6 @@
 # cmark-gfm.st
 
-Markdown for Pharo 12 to 15: [cmark-gfm](https://github.com/github/cmark-gfm) 0.29.0.gfm.14, GitHub's CommonMark parser with the GFM extensions (tables, strikethrough, autolinks, the tag filter, task lists) and footnotes, parses the source, and Smalltalk walks the parse tree as objects: one class per node type, with navigation, source positions and a visitor. The package `CMark-Roassal` draws a parsed document as one composite Roassal shape.
+Markdown for Pharo 12 to 15: [cmark-gfm](https://github.com/github/cmark-gfm) 0.29.0.gfm.14, GitHub's CommonMark parser with the GFM extensions (tables, strikethrough, autolinks, the tag filter, task lists) and footnotes, parses the source, and Smalltalk walks the parse tree as objects: one class per node type, with navigation, source positions and a visitor. The package `CMark-Roassal` draws a parsed document as one composite Roassal shape, and `CMark-Calypso` uses it for a Markdown tab of class comments in the Calypso browser.
 
 The parsing is done by the CMarkPlugin of the VM of [massimo-nocentini/pharo-vm](https://github.com/massimo-nocentini/pharo-vm) (`plugins/CMarkPlugin`, whose `docs/CMark.md` is the contract). It is built into the native VMs and the WebAssembly VMs of that fork. There is no FFI binding and no Smalltalk parser. Without the plugin, trees can still be built by hand, walked, visited and drawn, but no Markdown can be parsed or rendered.
 
@@ -30,8 +30,10 @@ Metacello new
 | `Tests` | `CMark-Tests` |
 | `Roassal` | `Core` and `CMark-Roassal`: the renderer, on the Roassal of the stock image |
 | `RoassalTests` | `CMark-Roassal-Tests` |
+| `Calypso` | `Roassal` and `CMark-Calypso`: the Markdown tab of the Calypso browser |
+| `CalypsoTests` | `CMark-Calypso-Tests` |
 | `RoassalFork` | the user's Roassal fork (`github://massimo-nocentini/Roassal:Pharo15/src`), then `Roassal`; opt-in, and loading it over a stock image needs `MCMergeOrLoadWarning` answered with `load` |
-| `default` | `Core`, `Tests`, `Roassal` and `RoassalTests` |
+| `default` | `Core`, `Tests`, `Roassal`, `RoassalTests`, `Calypso` and `CalypsoTests` |
 
 From a checkout of the VM, `plugins/CMarkPlugin/tests/load-cmark.st` loads the submodule, and `run-st-tests.sh` runs the tests.
 
@@ -162,13 +164,25 @@ The inspector of a node has a `Rendered` tab (for trees of at most 5000 nodes).
 
 Limits of the view: the fonts of the image only, so CJK characters and emoji are drawn as boxes (no glyph fallback); no syntax highlighting, no math, no selection; GitHub alerts are plain quotes; `codeWrap: #none` code lines, words wider than the column and tables whose words do not fit are the only things wider than `maxWidth`.
 
+## Class comments in Calypso
+
+The package `CMark-Calypso` (group `Calypso`, in `default`) adds a **Markdown** tab to the Calypso browser, between the `Comment` and the `UML-Class` tabs: the comment of the selected class, parsed by cmark-gfm (`CMarkOptions gfm`, with footnotes) and drawn by `CMarkRoassalRenderer`. It needs only the Calypso, Spec and Roassal of the stock images, not Roassal-UML-Calypso (which the stock images do not have; the user's Roassal fork has it).
+
+```smalltalk
+(CMarkCommentPresenter on: CMarkRoassalRenderer) open.     "the same view in a window of its own"
+```
+
+- `CMarkCommentPresenter` is a Spec presenter holding an `SpRoassalPresenter`. Its canvas is drawn by `CMarkRoassalRenderer>>show:on:` (which `canvasFor:` uses too): the camera fits the width and shows the top, again when the view is resized, and a canvas controller zooms and pans. The theme follows the UI theme of Pharo (`CMarkRoassalTheme dark` on a dark UI theme, `default` on a light one), unless `markdownTheme:` sets one. It draws again when the comment of its class changes (it subscribes weakly to `ClassCommented`, and unsubscribes when its window closes or when told to: `unsubscribe`) and when `targetClass:` gives it another class. An empty comment, a VM without the CMarkPlugin and a comment that cmark refuses show a short muted note instead.
+- `CMarkClassCommentToolMorph` is the tab (a `ClyBrowserToolMorph`): it is activated when a class whose comment is not blank is selected (on either side), with `tabOrder` 10.5, after the Comment tab (`ClyRichTextClassCommentEditorToolMorph`, 10 on Pharo 12 to 15, like the class definition) and before the setUp tab of the test classes (11) and the UML-Class tab (200). Its `activationPriority`, -200 like the UML-Class tab's, never takes the default selection from the definition or the comment. Calypso builds a tab when it is first shown, and the tab unsubscribes its presenter when Calypso removes it (another class selected, the browser closed).
+
 ## Tests
 
-`CMark-Tests` (105 tests) and `CMark-Roassal-Tests` (78 tests, with golden structural dumps of the rendered fixtures). Without the plugin, the tests that parse skip themselves (45 and 11 of them): the rest covers the decoder on hand-made tapes, the hand-built trees, the visitor, the options and the renderer on hand-built trees. The structure of a dump is compared under any cairo, its bounds only under cairo 1.18 (the goldens' `CMarkRoassalGoldens cairoVersion`, which this repository's VM builds): cairo's text metrics differ between versions, and under another cairo, such as the 1.17.4 of the VMs of files.pharo.org, the golden tests skip once the structure matched. From a checkout of the VM:
+`CMark-Tests` (105 tests), `CMark-Roassal-Tests` (78 tests, with golden structural dumps of the rendered fixtures) and `CMark-Calypso-Tests` (25 tests: the presenter, the tab and its order in a real `ClyFullBrowserMorph`, on scratch classes that the tests make and remove). Without the plugin, the tests that parse skip themselves (45, 11 and 5 of them): the rest covers the decoder on hand-made tapes, the hand-built trees, the visitor, the options and the renderer on hand-built trees. The structure of a dump is compared under any cairo, its bounds only under cairo 1.18 (the goldens' `CMarkRoassalGoldens cairoVersion`, which this repository's VM builds): cairo's text metrics differ between versions, and under another cairo, such as the 1.17.4 of the VMs of files.pharo.org, the golden tests skip once the structure matched. From a checkout of the VM:
 
 ```sh
 sh plugins/CMarkPlugin/tests/run-st-tests.sh build/build/vm Pharo.image
 CMARK_GROUPS='Core Tests Roassal RoassalTests' sh plugins/CMarkPlugin/tests/run-st-tests.sh build/build/vm Pharo.image
+CMARK_GROUPS='default' sh plugins/CMarkPlugin/tests/run-st-tests.sh build/build/vm Pharo.image
 ```
 
 ## Tree format

@@ -1,0 +1,258 @@
+"
+I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, with footnotes) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once the pointer is over the canvas).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one) unless markdownTheme: sets one.
+
+	(CMarkCommentPresenter on: CMarkRoassalRenderer) open.
+
+I am the content of the Markdown tab of the Calypso browser (CMarkClassCommentToolMorph), and work alone too.
+
+I draw again when the comment of my class changes (ClassCommented, from the SystemAnnouncer, to which I subscribe weakly when I am made) and when targetClass: gives me another class.  I unsubscribe when my window closes (windowIsClosing) or when told to (unsubscribe: the Calypso tab does it when it is removed, and when its browser closes).  I never fail on a comment: an empty comment, a VM without the CMarkPlugin and a comment that cmark refuses each show a short muted note instead.
+"
+Class {
+	#name : 'CMarkCommentPresenter',
+	#superclass : 'SpPresenter',
+	#instVars : [
+		'targetClass',
+		'roassal',
+		'markdownTheme',
+		'shape'
+	],
+	#category : 'CMark-Calypso-Presenter',
+	#package : 'CMark-Calypso',
+	#tag : 'Presenter'
+}
+
+{ #category : 'comments' }
+CMarkCommentPresenter class >> commentOf: aClassOrNil [
+	"The comment of aClassOrNil (of its instance side: a metaclass has its class's comment), '' when it has none"
+
+	aClassOrNil ifNil: [ ^ '' ].
+	^ aClassOrNil instanceSide comment ifNil: [ '' ]
+]
+
+{ #category : 'comments' }
+CMarkCommentPresenter class >> hasCommentToShow: aClassOrNil [
+	"Whether aClassOrNil has a comment that is not only blanks"
+
+	^ ((self commentOf: aClassOrNil) allSatisfy: [ :each | each isSeparator ]) not
+]
+
+{ #category : 'theme' }
+CMarkCommentPresenter class >> isDarkUITheme [
+	"Whether the UI theme of Pharo is dark: its background is darker than mid-grey"
+
+	^ [ Smalltalk ui theme backgroundColor luminance < 0.5 ]
+		  on: Error
+		  do: [ :error | false ]
+]
+
+{ #category : 'notes' }
+CMarkCommentPresenter class >> noteDocument: aString [
+	"A hand-built document of one paragraph, aString in emphasis: a note, which the presenter draws in the muted colour of its theme"
+
+	^ CMarkDocument withAll: { (CMarkParagraph with: { (CMarkEmph with: { (CMarkText literal: aString) }) }) }
+]
+
+{ #category : 'parsing' }
+CMarkCommentPresenter class >> options [
+	"The options of the parse of a comment: GitHub Flavored Markdown, with footnotes"
+
+	^ CMarkOptions gfm
+		  footnotes: true;
+		  yourself
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> canvas [
+	"The canvas of my Roassal presenter, drawn: when I am not built yet, it is drawn now, and my build shows it"
+
+	roassal currentCanvas ifNil: [
+		| canvas |
+		canvas := RSCanvas new.
+		self drawOn: canvas.
+		roassal canvas: canvas ].
+	^ roassal currentCanvas
+]
+
+{ #category : 'announcements' }
+CMarkCommentPresenter >> classCommented: aClassCommented [
+	"The comment of a class changed: draw again when it is mine"
+
+	(targetClass notNil and: [ aClassCommented classCommented instanceSide == targetClass instanceSide ]) ifTrue: [ self refresh ]
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> comment [
+	"The comment that I show"
+
+	^ self class commentOf: targetClass
+]
+
+{ #category : 'rendering' }
+CMarkCommentPresenter >> contents [
+	"What I draw: the comment parsed into a CMarkDocument, or the String of a note when there is no comment, no CMarkPlugin, or cmark refuses the comment"
+
+	(self class hasCommentToShow: targetClass) ifFalse: [ ^ self emptyNote ].
+	CMark isAvailable ifFalse: [ ^ self noPluginNote ].
+	^ [ CMark parse: self comment options: self class options ]
+		  on: CMarkError
+		  do: [ :error | 'The comment cannot be shown as Markdown: ' , error description ]
+]
+
+{ #category : 'layout' }
+CMarkCommentPresenter >> defaultLayout [
+	^ SpBoxLayout newTopToBottom
+		  add: roassal;
+		  yourself
+]
+
+{ #category : 'rendering' }
+CMarkCommentPresenter >> drawOn: aCanvas [
+	"The script of my Roassal presenter: draw my contents on aCanvas, a new canvas (a note in the muted colour of the theme), and keep the shape"
+
+	| theme contents |
+	theme := self markdownTheme.
+	contents := self contents.
+	contents isString ifTrue: [
+		theme := theme copy
+			         textColor: theme mutedColor;
+			         yourself.
+		contents := self class noteDocument: contents ].
+	shape := (CMarkRoassalRenderer theme: theme) show: contents on: aCanvas.
+	"the keys of the canvas controller act once the canvas has the focus, as in the UML tab of Roassal"
+	aCanvas when: RSMouseEnter do: [ :event | aCanvas morph ifNotNil: [ :morph | morph takeKeyboardFocus ] ] for: self
+]
+
+{ #category : 'notes' }
+CMarkCommentPresenter >> emptyNote [
+	^ 'This class has no comment.'
+]
+
+{ #category : 'initialization' }
+CMarkCommentPresenter >> initialize [
+	super initialize.
+	self subscribe
+]
+
+{ #category : 'initialization' }
+CMarkCommentPresenter >> initializePresenters [
+	roassal := self instantiate: SpRoassalPresenter.
+	roassal script: [ :canvas | self drawOn: canvas ]
+]
+
+{ #category : 'initialization' }
+CMarkCommentPresenter >> initializeWindow: aWindowPresenter [
+	aWindowPresenter
+		title: self windowTitle;
+		initialExtent: 720 @ 640
+]
+
+{ #category : 'announcements' }
+CMarkCommentPresenter >> isSubscribed [
+	"Whether I listen to the changes of comments"
+
+	^ SystemAnnouncer uniqueInstance hasSubscriber: self
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> markdownTheme [
+	"The CMarkRoassalTheme of the drawing: the one set, else dark on a dark UI theme and default on a light one"
+
+	^ markdownTheme ifNil: [
+		  self class isDarkUITheme
+			  ifTrue: [ CMarkRoassalTheme dark ]
+			  ifFalse: [ CMarkRoassalTheme default ] ]
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> markdownTheme: aThemeOrNil [
+	"Draw with aThemeOrNil (nil: follow the UI theme)"
+
+	markdownTheme := aThemeOrNil.
+	self refresh
+]
+
+{ #category : 'notes' }
+CMarkCommentPresenter >> noPluginNote [
+	^ 'The VM has no CMarkPlugin: the comment cannot be shown as Markdown.'
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> roassal [
+	"My SpRoassalPresenter"
+
+	^ roassal
+]
+
+{ #category : 'rendering' }
+CMarkCommentPresenter >> refresh [
+	"Draw again: on a new canvas of my Roassal presenter once it is built, else when it is built (or when canvas is asked)"
+
+	roassal ifNil: [ ^ self ].
+	roassal adapter
+		ifNil: [ roassal canvas: nil ]
+		ifNotNil: [ roassal refresh ].
+	self withWindowDo: [ :window | window title: self windowTitle ]
+]
+
+{ #category : 'initialization' }
+CMarkCommentPresenter >> setModel: aClass [
+	self targetClass: aClass
+]
+
+{ #category : 'initialization' }
+CMarkCommentPresenter >> setModelBeforeInitialization: aClass [
+	targetClass := aClass
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> shape [
+	"The RSComposite of the last drawing (its model is the document drawn), or nil before the first"
+
+	^ shape
+]
+
+{ #category : 'announcements' }
+CMarkCommentPresenter >> subscribe [
+	"Listen to the changes of comments, weakly: a presenter that nobody holds any more is not kept by the subscription"
+
+	self isSubscribed ifTrue: [ ^ self ].
+	SystemAnnouncer uniqueInstance weak
+		when: ClassCommented
+		send: #classCommented:
+		to: self
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> targetClass [
+	"The class whose comment I show"
+
+	^ targetClass
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> targetClass: aClass [
+	"Show the comment of aClass"
+
+	targetClass := aClass.
+	self refresh
+]
+
+{ #category : 'announcements' }
+CMarkCommentPresenter >> unsubscribe [
+	"Stop listening to the changes of comments"
+
+	SystemAnnouncer uniqueInstance unsubscribe: self
+]
+
+{ #category : 'announcements' }
+CMarkCommentPresenter >> windowIsClosing [
+	self unsubscribe.
+	super windowIsClosing
+]
+
+{ #category : 'accessing' }
+CMarkCommentPresenter >> windowTitle [
+	^ targetClass
+		  ifNil: [ 'Comment' ]
+		  ifNotNil: [ :aClass | 'Comment of ' , aClass instanceSide name ]
+]
