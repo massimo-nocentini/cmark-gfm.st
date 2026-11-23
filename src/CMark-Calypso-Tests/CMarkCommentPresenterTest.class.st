@@ -122,6 +122,33 @@ CMarkCommentPresenterTest >> testIgnoresTheCommentsOfOtherClasses [
 ]
 
 { #category : 'tests' }
+CMarkCommentPresenterTest >> testLongLinesWrap [
+	"A long code line (a tab-indented line of Smalltalk is a code block) and a long word wrap: the page keeps the width of the theme, so that the camera, which fits the width, keeps the text readable"
+
+	| presenter width canvas theme |
+	self requireCanvas.
+	self requirePlugin.
+	presenter := self presenterOn: (self scratchClass: #CMarkCalypsoScratchA comment: 'Some text.
+
+	' , (String new: 600 withAll: $x) , '
+
+A word: ' , (String new: 400 withAll: $y) , '.
+').
+	self assert: presenter markdownTheme codeWrap equals: #characters.
+	self assert: presenter markdownTheme breakLongWords.
+	theme := presenter markdownTheme.
+	canvas := presenter canvas.
+	width := presenter shape encompassingRectangle width.
+	"the page: the column and its padding on both sides"
+	self assert: width <= (theme maxWidth + (2 * theme padding) + 1).
+	canvas extent: 1000 @ 800.
+	self assert: canvas camera scale >= (1000 / (theme maxWidth + (2 * theme padding) + 1)).
+	"a theme set is used as it is"
+	presenter markdownTheme: CMarkRoassalTheme default.
+	self assert: presenter markdownTheme codeWrap equals: #none
+]
+
+{ #category : 'tests' }
 CMarkCommentPresenterTest >> testMetaclassShowsTheComment [
 	| aClass presenter |
 	aClass := self scratchClass: #CMarkCalypsoScratchA comment: '# Class side'.

@@ -1,5 +1,5 @@
 "
-I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, without footnotes: see options) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once the pointer is over the canvas).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one) unless markdownTheme: sets one.
+I show the comment of a class as Markdown: cmark-gfm parses it (CMarkOptions gfm, without footnotes: see options) and CMarkRoassalRenderer draws it in the canvas of an SpRoassalPresenter.  As with CMarkRoassalRenderer>>canvasFor:, the camera fits the width and shows the top, again whenever the view is resized, and a canvas controller zooms and pans (the wheel, a drag, the keys once the pointer is over the canvas).  The theme follows the UI theme of Pharo (CMarkRoassalTheme dark on a dark UI theme, default on a light one, both wrapping long code lines and long words so that the page keeps the width of the theme) unless markdownTheme: sets one.
 
 	(CMarkCommentPresenter on: CMarkRoassalRenderer) open.
 
@@ -162,12 +162,15 @@ CMarkCommentPresenter >> isSubscribed [
 
 { #category : 'accessing' }
 CMarkCommentPresenter >> markdownTheme [
-	"The CMarkRoassalTheme of the drawing: the one set, else dark on a dark UI theme and default on a light one"
+	"The CMarkRoassalTheme of the drawing: the one set (used as it is), else dark on a dark UI theme and default on a light one, both wrapping long code lines and long words.  The camera fits the width of the page: a code line that does not wrap would widen the page and shrink all of its text (tab-indented Smalltalk in a comment is a code block; the comment of Color was drawn at a quarter of its size)"
 
 	^ markdownTheme ifNil: [
-		  self class isDarkUITheme
-			  ifTrue: [ CMarkRoassalTheme dark ]
-			  ifFalse: [ CMarkRoassalTheme default ] ]
+		  (self class isDarkUITheme
+			   ifTrue: [ CMarkRoassalTheme dark ]
+			   ifFalse: [ CMarkRoassalTheme default ])
+			  codeWrap: #characters;
+			  breakLongWords: true;
+			  yourself ]
 ]
 
 { #category : 'accessing' }
