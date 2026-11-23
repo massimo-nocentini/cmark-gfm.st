@@ -30,7 +30,7 @@ Class {
 	#superclass : 'ClyBrowserToolMorph',
 	#instVars : [
 		'targetClass',
-		'presenter'
+		'commentPresenter'
 	],
 	#category : 'CMark-Calypso-Calypso',
 	#package : 'CMark-Calypso',
@@ -77,12 +77,19 @@ CMarkClassCommentToolMorph >> belongsToRemovedBrowserContext [
 { #category : 'building' }
 CMarkClassCommentToolMorph >> build [
 	| morph |
-	presenter := CMarkCommentPresenter on: targetClass.
-	morph := presenter build.
+	commentPresenter := CMarkCommentPresenter on: targetClass.
+	morph := commentPresenter build.
 	morph
 		hResizing: #spaceFill;
 		vResizing: #spaceFill.
 	self addMorph: morph fullFrame: LayoutFrame identity
+]
+
+{ #category : 'accessing' }
+CMarkClassCommentToolMorph >> commentPresenter [
+	"My CMarkCommentPresenter, once I am built (not #presenter: Morph>>presenter and presenter: are a property that Spec sets)"
+
+	^ commentPresenter
 ]
 
 { #category : 'initialization' }
@@ -98,7 +105,7 @@ CMarkClassCommentToolMorph >> defaultTitle [
 { #category : 'initialization' }
 CMarkClassCommentToolMorph >> detachFromSystem [
 	super detachFromSystem.
-	presenter ifNotNil: [ :aPresenter | aPresenter unsubscribe ]
+	commentPresenter ifNotNil: [ :aPresenter | aPresenter unsubscribe ]
 ]
 
 { #category : 'testing' }
@@ -113,13 +120,6 @@ CMarkClassCommentToolMorph >> isValidInContext: aBrowserContext [
 CMarkClassCommentToolMorph >> isSimilarTo: anotherBrowserTool [
 	(super isSimilarTo: anotherBrowserTool) ifFalse: [ ^ false ].
 	^ targetClass = anotherBrowserTool targetClass
-]
-
-{ #category : 'accessing' }
-CMarkClassCommentToolMorph >> presenter [
-	"My CMarkCommentPresenter, once I am built"
-
-	^ presenter
 ]
 
 { #category : 'initialization' }

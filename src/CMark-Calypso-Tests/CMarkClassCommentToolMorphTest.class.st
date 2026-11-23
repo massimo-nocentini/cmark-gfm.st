@@ -23,7 +23,7 @@ CMarkClassCommentToolMorphTest >> show: aTool in: aBrowser [
 	"Select the tab of aTool, which builds it (Calypso builds a tab when it is shown)"
 
 	aBrowser tabManager tabMorph page: aTool containerTab.
-	self assert: aTool presenter notNil
+	self assert: aTool commentPresenter notNil
 ]
 
 { #category : 'tests' }
@@ -50,7 +50,7 @@ CMarkClassCommentToolMorphTest >> testBrowserClosingUnsubscribesThePresenter [
 	browser := self browserOn: (self scratchClass: #CMarkCalypsoScratchA comment: self richComment).
 	tool := self markdownToolOf: browser.
 	self show: tool in: browser.
-	presenter := tool presenter.
+	presenter := tool commentPresenter.
 	self assert: presenter isSubscribed.
 	browser windowIsClosing.
 	self deny: presenter isSubscribed.
@@ -67,11 +67,11 @@ CMarkClassCommentToolMorphTest >> testBrowserDrawsTheComment [
 	tool := self markdownToolOf: browser.
 	self assert: tool targetClass identicalTo: aClass.
 	self show: tool in: browser.
-	self assert: tool presenter targetClass identicalTo: aClass.
-	self assert: tool presenter shape model sourceString equals: aClass comment.
-	self assert: (tool allMorphs includes: tool presenter roassal adapter widget).
+	self assert: tool commentPresenter targetClass identicalTo: aClass.
+	self assert: tool commentPresenter shape model sourceString equals: aClass comment.
+	self assert: (tool allMorphs includes: tool commentPresenter roassal adapter widget).
 	aClass comment: '# Changed'.
-	self assert: tool presenter shape model headings first plainText equals: 'Changed'
+	self assert: tool commentPresenter shape model headings first plainText equals: 'Changed'
 ]
 
 { #category : 'tests' }
@@ -162,7 +162,7 @@ CMarkClassCommentToolMorphTest >> testBlankCommentRemovesTheTab [
 	browser := self browserOn: aClass.
 	tool := self markdownToolOf: browser.
 	self show: tool in: browser.
-	presenter := tool presenter.
+	presenter := tool commentPresenter.
 	aClass comment: ''.
 	browser rebuildToolsForChangedEnvironment.
 	self assert: (self markdownToolsOf: browser) isEmpty.
@@ -182,7 +182,7 @@ CMarkClassCommentToolMorphTest >> testRemovingTheClassRemovesTheTab [
 	browser := self browserOn: aClass.
 	tool := self markdownToolOf: browser.
 	self show: tool in: browser.
-	presenter := tool presenter.
+	presenter := tool commentPresenter.
 	aClass removeFromSystem.
 	browser rebuildToolsForChangedEnvironment.
 	self assert: (self markdownToolsOf: browser) isEmpty.
@@ -194,6 +194,19 @@ CMarkClassCommentToolMorphTest >> testRemovingTheClassRemovesTheTab [
 	aClass removeFromSystem.
 	browser rebuildToolsForChangedEnvironment.
 	self assert: (self markdownToolsOf: browser) isEmpty
+]
+
+{ #category : 'tests' }
+CMarkClassCommentToolMorphTest >> testKeepsTheMorphPresenterProperty [
+	"The tool does not override Morph>>presenter, whose setter Spec uses (SpMorphicMorphAdapter): the pair stays consistent"
+
+	| tool marker |
+	self deny: (CMarkClassCommentToolMorph includesSelector: #presenter).
+	tool := CMarkClassCommentToolMorph new.
+	marker := Object new.
+	tool presenter: marker.
+	self assert: tool presenter identicalTo: marker.
+	self assert: tool commentPresenter isNil
 ]
 
 { #category : 'tests' }
@@ -211,7 +224,7 @@ CMarkClassCommentToolMorphTest >> testSelectingAnotherClassUnsubscribesThePresen
 	browser := self browserOn: (self scratchClass: #CMarkCalypsoScratchA comment: 'one').
 	tool := self markdownToolOf: browser.
 	self show: tool in: browser.
-	presenter := tool presenter.
+	presenter := tool commentPresenter.
 	other := self scratchClass: #CMarkCalypsoScratchB comment: 'two'.
 	browser selectClass: other.
 	self deny: presenter isSubscribed.
