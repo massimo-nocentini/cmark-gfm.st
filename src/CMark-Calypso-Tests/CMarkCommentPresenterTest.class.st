@@ -1,5 +1,5 @@
 "
-I test CMarkCommentPresenter: the canvas of a class comment (the CMark shape, the camera of canvasFor:, long lines that wrap, Smalltalk code that keeps its text), the theme (dark or light UI theme, set or followed, a change of the UI theme), the notes of an empty comment, of a VM without the plugin and of a comment cmark refuses, drawing again when the comment or the class changes, the drawing in the Morphic UI process only when another process asks for it (once for all that wait), the window title, the keyboard focus, and the weak subscription to the changes of comments, which ends when the window closes.
+I test CMarkCommentPresenter: the canvas of a class comment (the CMark shape, the camera of canvasFor:, long lines that wrap, Smalltalk code that keeps its text), the theme (dark or light UI theme, set or followed, a change of the UI theme), the notes of an empty comment, of a VM without the plugin and of a comment cmark refuses, drawing again when the comment or the class changes, the drawing in the Morphic UI process only when another process asks for it (once for all that wait) and at once when the presenter is not built, the window title, the keyboard focus, and the weak subscription to the changes of comments, which ends when the window closes.
 "
 Class {
 	#name : 'CMarkCommentPresenterTest',
@@ -151,6 +151,54 @@ CMarkCommentPresenterTest >> testRefreshesFromAnotherProcessAreDrawnOnce [
 	self assert: presenter shape model headings first plainText equals: 'Other'.
 	self assert: presenter roassal currentCanvas shapes first identicalTo: presenter shape.
 	self assert: presenter roassal currentCanvas color equals: presenter markdownTheme background
+]
+
+{ #category : 'tests' }
+CMarkCommentPresenterTest >> testUnbuiltPresenterInAnotherProcessIsDrawnAtOnce [
+	"A presenter that is not built has no morph for the UI process to draw: in another process (a script), each way to draw again draws at once, and the next canvas and shape of that process show the change, as the UI process runs no refresh later"
+
+	| first other presenter process done errors headings themed pending canvases |
+	self requireCanvas.
+	self requirePlugin.
+	first := self scratchClass: #CMarkCalypsoScratchA comment: '# First'.
+	other := self scratchClass: #CMarkCalypsoScratchB comment: '# Other'.
+	presenter := self recordingPresenterOn: first.
+	done := Semaphore new.
+	errors := OrderedCollection new.
+	headings := OrderedCollection new.
+	pending := OrderedCollection new.
+	canvases := OrderedCollection new.
+	process := [
+	[
+	canvases add: presenter canvas.
+	headings add: presenter shape model headings first plainText.
+	presenter targetClass: other.
+	pending add: presenter isRefreshPending.
+	headings add: presenter canvas shapes first model headings first plainText.
+	other comment: '# Other again'.
+	pending add: presenter isRefreshPending.
+	headings add: presenter canvas shapes first model headings first plainText.
+	presenter markdownTheme: CMarkRoassalTheme dark.
+	pending add: presenter isRefreshPending.
+	themed := presenter canvas color = CMarkRoassalTheme dark background.
+	canvases add: presenter canvas ]
+		on: Error
+		do: [ :error | errors add: error ].
+	done signal ] newProcess.
+	process resume.
+	self deny: (done waitTimeoutSeconds: 60).
+	self assert: errors asArray equals: #(  ).
+	self assert: headings asArray equals: #( 'First' 'Other' 'Other again' ).
+	self assert: pending asArray equals: #( false false false ).
+	self assert: themed.
+	self deny: canvases last identicalTo: canvases first.
+	self assert: presenter drawingProcesses size equals: 4.
+	self assert: (presenter drawingProcesses allSatisfy: [ :each | each == process ]).
+	"no refresh waits for the UI process: its next cycle leaves the canvas as it is"
+	self runUICycle.
+	self assert: presenter drawingProcesses size equals: 4.
+	self assert: presenter roassal currentCanvas notNil.
+	self assert: presenter roassal currentCanvas shapes first identicalTo: presenter shape
 ]
 
 { #category : 'tests' }

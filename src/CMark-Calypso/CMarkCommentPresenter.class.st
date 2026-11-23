@@ -206,8 +206,9 @@ CMarkCommentPresenter >> roassal [
 
 { #category : 'rendering' }
 CMarkCommentPresenter >> refresh [
-	"Draw again, in the Morphic UI process: now when I am in it (or when there is none: no world loop draws my morph), else at the next cycle of the UI process.  A comment changed by another process (a load in the background) was drawn by that process while the UI process drew the world, and the drawing failed now and then (MessageNotUnderstood: receiver of #intersect: is nil, in RSMorphicHost>>dirtyRectangle:).  A refresh asked while another one waits for the UI process adds nothing: the one that waits draws what there is when it runs"
+	"Draw again, in the Morphic UI process: now when I am in it (or when there is none: no world loop draws my morph), else at the next cycle of the UI process.  A comment changed by another process (a load in the background) was drawn by that process while the UI process drew the world, and the drawing failed now and then (MessageNotUnderstood: receiver of #intersect: is nil, in RSMorphicHost>>dirtyRectangle:).  A refresh asked while another one waits for the UI process adds nothing: the one that waits draws what there is when it runs.  When I am not built, no morph of mine is drawn by the UI process: the refresh is done now, in any process, so that the next canvas or shape of the caller shows the change"
 
+	(roassal isNil or: [ roassal adapter isNil ]) ifTrue: [ ^ self refreshNow ].
 	self isInUIProcess ifTrue: [ ^ self refreshNow ].
 	refreshPending == true ifTrue: [ ^ self ].
 	refreshPending := true.
@@ -232,7 +233,7 @@ CMarkCommentPresenter >> isRefreshPending [
 
 { #category : 'rendering' }
 CMarkCommentPresenter >> refreshNow [
-	"Draw again here, in the UI process (refresh): on a new canvas of my Roassal presenter once it is built, else when it is built (or when canvas is asked).  A refresh that waits for the UI process has nothing more to do"
+	"Draw again here, in the UI process or, when I am not built, in any process (refresh): on a new canvas of my Roassal presenter once it is built, else when it is built (or when canvas is asked).  A refresh that waits for the UI process has nothing more to do"
 
 	refreshPending := false.
 	roassal ifNil: [ ^ self ].
