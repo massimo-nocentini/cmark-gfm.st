@@ -191,16 +191,9 @@ CMarkRoassalRenderer >> bulletSquare: aSize color: aColor [
 CMarkRoassalRenderer >> canvasFor: aNode [
 	"An RSCanvas showing the rendering of aNode, with a canvas controller; the camera fits the width and shows the top (not zoomToFit, which makes tall documents unreadable)"
 
-	| canvas shape controller |
-	shape := self render: aNode.
+	| canvas |
 	canvas := RSCanvas new.
-	theme background ifNotNil: [ :color | canvas color: color ].
-	canvas add: shape.
-	controller := RSCanvasController new.
-	(controller interactions at: RSZoomToFitCanvasInteraction ifAbsent: [ nil ]) ifNotNil: [ :zoom | zoom noZoomToFitOnStart ].
-	canvas @ controller.
-	canvas when: RSExtentChangedEvent do: [ :event | self fitWidthAndTop: shape in: canvas ] for: self.
-	self fitWidthAndTop: shape in: canvas.
+	self show: aNode on: canvas.
 	^ canvas
 ]
 
@@ -818,6 +811,22 @@ CMarkRoassalRenderer >> shapeCount [
 	"The number of shapes made by the current (or last) rendering"
 
 	^ shapeCount
+]
+
+{ #category : 'rendering' }
+CMarkRoassalRenderer >> show: aNode on: aCanvas [
+	"Add the rendering of aNode to aCanvas (an empty canvas, such as the one of an SpRoassalPresenter), in the background of the theme and with a canvas controller (zoom and pan); the camera fits the width and shows the top now and whenever the extent of aCanvas changes (not zoomToFit, which makes tall documents unreadable).  Answer the RSComposite of aNode"
+
+	| shape controller |
+	shape := self render: aNode.
+	theme background ifNotNil: [ :color | aCanvas color: color ].
+	aCanvas add: shape.
+	controller := RSCanvasController new.
+	(controller interactions at: RSZoomToFitCanvasInteraction ifAbsent: [ nil ]) ifNotNil: [ :zoom | zoom noZoomToFitOnStart ].
+	aCanvas @ controller.
+	aCanvas when: RSExtentChangedEvent do: [ :event | self fitWidthAndTop: shape in: aCanvas ] for: self.
+	self fitWidthAndTop: shape in: aCanvas.
+	^ shape
 ]
 
 { #category : 'shapes' }
