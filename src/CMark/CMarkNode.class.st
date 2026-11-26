@@ -404,11 +404,11 @@ CMarkNode >> initializeDecoded [
 ]
 
 { #category : 'inspector' }
-CMarkNode >> inspectionCMarkSource [
+CMarkNode >> inspectionCMarkSource: aBuilder [
 	"The source text of my node, for the inspector"
 
 	<inspectorPresentationOrder: 2 title: 'Source'>
-	^ SpTextPresenter new
+	^ aBuilder newText
 		  text: (self sourceText ifNil: [ '' ]);
 		  yourself
 ]
@@ -419,11 +419,11 @@ CMarkNode >> inspectionCMarkSourceContext: aContext [
 ]
 
 { #category : 'inspector' }
-CMarkNode >> inspectionCMarkTree [
+CMarkNode >> inspectionCMarkTree: aBuilder [
 	"My tree, for the inspector"
 
 	<inspectorPresentationOrder: 0 title: 'CMark'>
-	^ SpTreePresenter new
+	^ aBuilder newTree
 		  roots: { self };
 		  children: [ :each | each children ];
 		  display: [ :each | each printString ];

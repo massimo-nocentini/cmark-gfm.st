@@ -92,7 +92,7 @@ CMarkRoassalCanvasTest >> testInspectorTab [
 	| doc context |
 	self requireCanvas.
 	doc := CMarkRoassalExamples handBuiltDocument.
-	self assert: (doc inspectionCMarkRendered isKindOf: SpPresenter).
+	self assert: ((self inspection: 'Rendered' of: doc) isKindOf: SpRoassalInspectorPresenter).
 	context := CMarkContextStub new.
 	doc inspectionCMarkRenderedContext: context.
 	self assert: context active

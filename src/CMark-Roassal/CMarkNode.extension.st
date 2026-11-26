@@ -62,9 +62,9 @@ CMarkNode >> cmarkRoassalPopupText [
 ]
 
 { #category : '*CMark-Roassal' }
-CMarkNode >> inspectionCMarkRendered [
+CMarkNode >> inspectionCMarkRendered: aBuilder [
 	<inspectorPresentationOrder: 1 title: 'Rendered'>
-	^ self asRoassalCanvas asPresenter
+	^ self asRoassalCanvas inspectorCanvas: aBuilder
 ]
 
 { #category : '*CMark-Roassal' }

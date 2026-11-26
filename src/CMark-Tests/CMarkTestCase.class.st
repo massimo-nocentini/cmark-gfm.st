@@ -24,6 +24,20 @@ CMarkTestCase class >> isAbstract [
 ]
 
 { #category : 'helpers' }
+CMarkTestCase >> inspection: aTitle of: anObject [
+	"The presenter of the tab titled aTitle of an inspector on anObject, made as the inspector makes it: its context from the pragmas of anObject, then its method sent with a presenter builder (Pharo 13 and later refuse an inspection method without one)"
+
+	| context |
+	context := (StInspectionCollector new
+		            inspectedObject: anObject;
+		            collectInspectionContexts)
+		           detect: [ :each | each title = aTitle ]
+		           ifNone: [ self fail: 'no active tab ' , aTitle printString ].
+	self assert: context methodSelectorNeedsBuilder.
+	^ anObject perform: context methodSelector with: context newPresenterBuilder
+]
+
+{ #category : 'helpers' }
 CMarkTestCase >> requirePlugin [
 	"Skip the test unless the VM has a CMarkPlugin of the protocol of CMarkPrimitives"
 

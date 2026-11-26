@@ -344,21 +344,33 @@ CMarkNodeTest >> testFixtures [
 CMarkNodeTest >> testInspector [
 	| node stub b doc presenter |
 	node := CMarkParagraph with: { (CMarkText literal: 'x') }.
-	presenter := node inspectionCMarkTree.
+	presenter := self inspection: 'CMark' of: node.
 	self assert: presenter notNil.
 	self assert: presenter class name equals: #SpTreePresenter.
 	self assert: presenter roots asArray equals: { node }.
 	stub := CMarkContextStub new.
 	node inspectionCMarkSourceContext: stub.
 	self deny: stub active.
-	self assert: node inspectionCMarkSource text asString equals: ''.
+	self assert: (node inspectionCMarkSource: SpPresenterBuilder new) text asString equals: ''.
 	b := CMarkTapeBuilder new source: 'hi'.
 	b at: (b add: 16r8008 parent: 1) line: 1 column: 1 toLine: 1 column: 2.
 	b at: 2 from: 1 to: 2.
 	doc := b decode.
 	doc firstChild inspectionCMarkSourceContext: stub.
 	self assert: stub active.
-	self assert: doc firstChild inspectionCMarkSource text asString equals: 'hi'
+	self assert: (self inspection: 'Source' of: doc firstChild) text asString equals: 'hi'
+]
+
+{ #category : 'tests' }
+CMarkNodeTest >> testInspectionsTakeABuilder [
+	"Pharo 13 and later show no tab of an inspection method without a presenter builder, only a warning"
+
+	| methods |
+	methods := (Pragma allNamed: #inspectorPresentationOrder:title:)
+		           collect: [ :each | each method ]
+		           thenSelect: [ :each | each package name beginsWith: 'CMark' ].
+	self assert: methods notEmpty.
+	self assert: (methods reject: [ :each | each numArgs = 1 ]) asArray equals: #(  )
 ]
 
 { #category : 'tests' }
